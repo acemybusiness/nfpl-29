@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- NFPL v92.4 — LIVE SYNC STARTUP FIX + NFPL-29-ONLY WEEK 1 ISOLATION — repair candidate — 2026-09-19 -->
+<!-- NFPL v92.5 — STALE PHONE ENDPOINT REPAIR + LIVE SYNC STARTUP FIX — repair candidate — 2026-09-19 -->
 <!-- v92: timestamp-driven blind clock; one-level-at-a-time rollover; active-clock sync protection -->
 <!-- Parent: NFPL-v88.82-PHONE-CLEAN-v25-WEEK-UPDATE-AND-DIRECT-SHARE.html -->
 <!-- NFPL v86 AMB READY
@@ -21,7 +21,7 @@
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
-<title>Newfound Poker League — v92.4 — Live Sync Startup Fix</title>
+<title>Newfound Poker League — v92.5 — Phone Sync Endpoint Repair</title>
 <style>
 :root{--navy:#071a33;--navy2:#0b2447;--panel:#102a4d;--panel2:#1b365d;--blue:#2d9cff;--orange:#ff8a00;--orange2:#ffae32;--ice:#f4f8fc;--line:#294b70;--muted:#9db6ce;--good:#29c477;--danger:#eb5b5b;--shadow:0 10px 24px rgba(0,0,0,.24)}
 *{box-sizing:border-box}html{background:#04101f}body{margin:0;background:linear-gradient(180deg,#06152a,#081b34 260px,#06152a);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#fff;min-height:100vh}button,input,select{font:inherit}button{cursor:pointer}.app{width:min(1180px,100%);margin:auto;padding:10px 10px 78px}.hero{position:relative;top:auto;z-index:2;background:rgba(7,26,51,.96);backdrop-filter:blur(12px);border:1px solid #233f61;border-radius:18px;padding:10px 12px;box-shadow:var(--shadow)}.head{display:flex;justify-content:space-between;align-items:center;gap:10px}.head h1{font-size:clamp(1.2rem,4vw,1.8rem);margin:0}.version{color:var(--orange2);font-weight:1000;font-size:.82rem}.save-pill{font-size:.7rem;color:#a9c7e4;font-weight:800}.tabs{display:flex;gap:6px;overflow:auto;padding-top:9px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{white-space:nowrap;border:1px solid #2d5178;background:#0d294c;color:#dcecff;border-radius:999px;padding:8px 12px;font-weight:900}.tab.active{background:var(--orange);color:#211406;border-color:var(--orange)}.page{display:none}.page.active{display:block}.card{background:linear-gradient(180deg,#102b4e,#0c2342);border:1px solid #274b70;border-radius:16px;padding:12px;margin-top:10px;box-shadow:0 8px 18px rgba(0,0,0,.16)}.section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}.section-title h2,.section-title h3{margin:0;font-size:1.05rem}.small{font-size:.72rem;color:var(--muted);font-weight:750}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.field{display:grid;gap:4px}.field label,.field>span{font-size:.72rem;color:#b8d0e7;font-weight:950;text-transform:uppercase;letter-spacing:.04em}.field input,.field select,input,select{width:100%;min-width:0;border:2px solid #dfe8f1;background:#f8fbff;color:#112033;border-radius:10px;padding:10px 11px;font-weight:900;outline:0}input:focus,select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,138,0,.15)}button.primary,button.secondary,button.danger,button.good{border:0;border-radius:10px;padding:10px 12px;font-weight:1000;min-height:42px}.primary{background:linear-gradient(180deg,var(--orange2),var(--orange));color:#231606;box-shadow:0 3px 0 #9a4a00}.secondary{background:#dceeff;color:#124d82}.danger{background:#ffdddd;color:#8f1f1f}.good{background:#bff4d8;color:#075f34}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.grow{flex:1}.toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%);background:#06172c;border:1px solid var(--orange);padding:10px 14px;border-radius:12px;font-weight:900;display:none;z-index:99;max-width:90vw;text-align:center}
@@ -7160,7 +7160,7 @@ body.standings-preview-open{overflow:hidden!important}
 </div></div><nav class="tabs" id="tabs"></nav></div></div></header>
 <div id="toast" class="toast"></div>
 <main id="pages"></main>
-<footer class="app-footer">© SRL - AMB • v92.4</footer>
+<footer class="app-footer">© SRL - AMB • v92.5</footer>
 </div>
 <nav class="bottom" id="bottom"></nav>
 <script>
@@ -16338,16 +16338,18 @@ function refreshCurrentWeekArchiveIfPresent(){
 <script>window.NFPL_SYNC_ENDPOINT='https://script.google.com/macros/s/AKfycbz11OfouNOUqNhDbRuSGK9ua50ag6yPNTFwGjrmLOitZccpQx8pid_xVvhw9x9tTRQE4g/exec';</script>
 <script id="nfpl-pv2-sync-script">
 const NFPL_SYNC_CONFIG_KEY='nfpl_pv2_sync_config';
-const NFPL_APP_VERSION='NFPL-v92.4';
+const NFPL_APP_VERSION='NFPL-v92.5';
 const NFPL_SYNC_ENDPOINT_KEY='nfpl_amb_sync_endpoint';
 function syncEndpoint(){
-  return String(localStorage.getItem(NFPL_SYNC_ENDPOINT_KEY)||window.NFPL_SYNC_ENDPOINT||'').trim();
+  /* This AMB installation has one approved Apps Script endpoint. Older phone
+     installs may still contain a retired endpoint in localStorage; never let
+     that stale value override the live NFPL connection. */
+  try{localStorage.removeItem(NFPL_SYNC_ENDPOINT_KEY);}catch(e){}
+  return String(window.NFPL_SYNC_ENDPOINT||'').trim();
 }
 function setSyncEndpoint(url){
-  const clean=String(url||'').trim();
-  if(clean)localStorage.setItem(NFPL_SYNC_ENDPOINT_KEY,clean);
-  else localStorage.removeItem(NFPL_SYNC_ENDPOINT_KEY);
-  return clean;
+  try{localStorage.removeItem(NFPL_SYNC_ENDPOINT_KEY);}catch(e){}
+  return syncEndpoint();
 }
 
 function syncConfig(){
