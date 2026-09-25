@@ -20,7 +20,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#071a33">
-<title>Newfound Poker League — v122 Delete Same Row</title>
+<title>Newfound Poker League — v126 Saved Row No Bounce</title>
 <style>
 :root{--navy:#071a33;--navy2:#0b2447;--panel:#102a4d;--panel2:#1b365d;--blue:#2d9cff;--orange:#ff8a00;--orange2:#ffae32;--ice:#f4f8fc;--line:#294b70;--muted:#9db6ce;--good:#29c477;--danger:#eb5b5b;--shadow:0 10px 24px rgba(0,0,0,.24)}
 *{box-sizing:border-box}html{background:#04101f}body{margin:0;background:linear-gradient(180deg,#06152a,#081b34 260px,#06152a);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#fff;min-height:100vh}button,input,select{font:inherit}button{cursor:pointer}.app{width:min(1180px,100%);margin:auto;padding:10px 10px 78px}.hero{position:relative;top:auto;z-index:2;background:rgba(7,26,51,.96);backdrop-filter:blur(12px);border:1px solid #233f61;border-radius:18px;padding:10px 12px;box-shadow:var(--shadow)}.head{display:flex;justify-content:space-between;align-items:center;gap:10px}.head h1{font-size:clamp(1.2rem,4vw,1.8rem);margin:0}.version{color:var(--orange2);font-weight:1000;font-size:.82rem}.save-pill{font-size:.7rem;color:#a9c7e4;font-weight:800}.tabs{display:flex;gap:6px;overflow:auto;padding-top:9px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{white-space:nowrap;border:1px solid #2d5178;background:#0d294c;color:#dcecff;border-radius:999px;padding:8px 12px;font-weight:900}.tab.active{background:var(--orange);color:#211406;border-color:var(--orange)}.page{display:none}.page.active{display:block}.card{background:linear-gradient(180deg,#102b4e,#0c2342);border:1px solid #274b70;border-radius:16px;padding:12px;margin-top:10px;box-shadow:0 8px 18px rgba(0,0,0,.16)}.section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}.section-title h2,.section-title h3{margin:0;font-size:1.05rem}.small{font-size:.72rem;color:var(--muted);font-weight:750}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.field{display:grid;gap:4px}.field label,.field>span{font-size:.72rem;color:#b8d0e7;font-weight:950;text-transform:uppercase;letter-spacing:.04em}.field input,.field select,input,select{width:100%;min-width:0;border:2px solid #dfe8f1;background:#f8fbff;color:#112033;border-radius:10px;padding:10px 11px;font-weight:900;outline:0}input:focus,select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,138,0,.15)}button.primary,button.secondary,button.danger,button.good{border:0;border-radius:10px;padding:10px 12px;font-weight:1000;min-height:42px}.primary{background:linear-gradient(180deg,var(--orange2),var(--orange));color:#231606;box-shadow:0 3px 0 #9a4a00}.secondary{background:#dceeff;color:#124d82}.danger{background:#ffdddd;color:#8f1f1f}.good{background:#bff4d8;color:#075f34}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.grow{flex:1}.toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%);background:#06172c;border:1px solid var(--orange);padding:10px 14px;border-radius:12px;font-weight:900;display:none;z-index:99;max-width:90vw;text-align:center}
@@ -22831,6 +22831,422 @@ setSyncMessage('Saved Boards Ready • Safe Merge','good');
   }
 }
 </style>
+
+
+
+<!-- NFPL v123 — saved-row spacing + persistent League/Game mode only. -->
+<style id="nfpl-v123-saved-row-layout">
+/* Desktop/tablet: give Saved dropdown enough room for the full event name,
+   then spread the three actions across the remaining space to the right. */
+@media (min-width:901px){
+  #page-setup .event-manager-clean .event-clean-grid{
+    display:grid!important;
+    grid-template-columns:
+      minmax(270px,.85fr)
+      minmax(420px,1.65fr)
+      minmax(210px,1fr)
+      minmax(235px,1.08fr)
+      minmax(205px,.95fr)!important;
+    gap:14px!important;
+    align-items:end!important;
+    width:100%!important;
+  }
+
+  #page-setup .event-manager-clean .event-saved-wrap{
+    min-width:0!important;
+    width:100%!important;
+  }
+
+  #page-setup .event-manager-clean .event-one-row-saved{
+    width:100%!important;
+    min-width:0!important;
+    padding-left:18px!important;
+    padding-right:44px!important;
+    white-space:nowrap!important;
+    text-overflow:ellipsis!important;
+  }
+
+  #page-setup .event-manager-clean .event-one-row-btn{
+    width:100%!important;
+    min-width:0!important;
+  }
+
+  #page-setup .event-manager-clean .event-delete-btn{
+    grid-column:auto!important;
+    margin:0!important;
+  }
+}
+
+/* Phone: keep controls usable without forcing the Saved name into a tiny column. */
+@media (max-width:900px){
+  #page-setup .event-manager-clean .event-clean-grid{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    grid-template-areas:
+      "mode mode"
+      "saved saved"
+      "open save"
+      "delete delete"!important;
+    gap:8px!important;
+  }
+  #page-setup .event-manager-clean .event-mode-toggle{grid-area:mode!important;}
+  #page-setup .event-manager-clean .event-saved-wrap{grid-area:saved!important;}
+  #page-setup .event-manager-clean .event-one-row-btn:nth-of-type(1){grid-area:open!important;}
+  #page-setup .event-manager-clean .event-save-btn{grid-area:save!important;}
+  #page-setup .event-manager-clean .event-delete-btn{grid-area:delete!important;}
+  #page-setup .event-manager-clean .event-one-row-saved{
+    width:100%!important;
+    white-space:nowrap!important;
+    text-overflow:ellipsis!important;
+  }
+}
+</style>
+
+<script id="nfpl-v123-game-mode-persist">
+const NFPL_V123_EVENT_MODE_KEY='nfpl_v123_event_mode';
+
+function nfplV123StoredMode(){
+  const v=localStorage.getItem(NFPL_V123_EVENT_MODE_KEY);
+  return v==='game'?'game':(v==='league'?'league':null);
+}
+function nfplV123SaveMode(type){
+  const mode=type==='game'?'game':'league';
+  localStorage.setItem(NFPL_V123_EVENT_MODE_KEY,mode);
+  return mode;
+}
+
+/* UI event mode is a local operator choice and should not be overwritten
+   just because cloud/shared state finishes syncing in the background. */
+currentEventType=function(){
+  const stored=nfplV123StoredMode();
+  if(stored)return stored;
+  return state.settings.eventType==='game'?'game':'league';
+};
+
+setEventType=function(type){
+  const mode=nfplV123SaveMode(type);
+  state.settings.eventType=mode;
+  if(!state.settings.eventName){
+    state.settings.eventName=mode==='game'
+      ?'One Day Game'
+      :(state.settings.leagueName||'Newfound Poker League');
+  }
+  save();
+  render();
+};
+
+/* Opening a saved record intentionally changes the active mode to that record. */
+const nfplV123OriginalLoadSavedEvent=loadSavedEvent;
+loadSavedEvent=function(id){
+  const record=getEventLibrary().find(x=>String(x.id)===String(id));
+  if(record)nfplV123SaveMode(record.type==='game'?'game':'league');
+  return nfplV123OriginalLoadSavedEvent.apply(this,arguments);
+};
+
+/* First run: preserve whatever mode the current build is already showing. */
+if(!nfplV123StoredMode()){
+  nfplV123SaveMode(state.settings.eventType==='game'?'game':'league');
+}
+</script>
+
+
+
+<!-- NFPL v124 — layout-only containment fix.
+     Keeps all saved-board controls on one line and inside the blue manager panel. -->
+<style id="nfpl-v124-saved-row-contained">
+@media (min-width:901px){
+  #page-setup .event-manager-clean{
+    overflow:hidden!important;
+  }
+
+  #page-setup .event-manager-clean .event-clean-grid{
+    display:grid!important;
+    grid-template-columns:
+      minmax(190px,.85fr)
+      minmax(330px,1.55fr)
+      minmax(185px,.95fr)
+      minmax(215px,1.08fr)
+      minmax(180px,.92fr)!important;
+    gap:12px!important;
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+    align-items:end!important;
+  }
+
+  #page-setup .event-manager-clean .event-mode-toggle,
+  #page-setup .event-manager-clean .event-saved-wrap,
+  #page-setup .event-manager-clean .event-one-row-btn{
+    min-width:0!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+
+  #page-setup .event-manager-clean .event-mode-toggle{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+    width:100%!important;
+  }
+
+  #page-setup .event-manager-clean .event-one-row-saved{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+
+  #page-setup .event-manager-clean .event-one-row-btn,
+  #page-setup .event-manager-clean .event-delete-btn{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+    white-space:nowrap!important;
+  }
+}
+</style>
+
+
+
+<!-- NFPL v125 — stable saved-board row after render/sync.
+     Prevents later re-render rules from widening/clipping the Delete button. -->
+<style id="nfpl-v125-stable-saved-row">
+@media (min-width:901px){
+  #page-setup .event-manager-clean{
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+    overflow:visible!important;
+  }
+
+  #page-setup .event-manager-clean .event-clean-grid{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    align-items:flex-end!important;
+    gap:12px!important;
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+
+  #page-setup .event-manager-clean .event-mode-toggle{
+    flex:0 0 285px!important;
+    width:285px!important;
+    min-width:0!important;
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+  }
+
+  #page-setup .event-manager-clean .event-saved-wrap{
+    flex:1 1 420px!important;
+    min-width:300px!important;
+    max-width:none!important;
+    width:auto!important;
+    box-sizing:border-box!important;
+  }
+
+  #page-setup .event-manager-clean .event-one-row-saved{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+
+  #page-setup .event-manager-clean .event-one-row-btn{
+    flex:0 1 auto!important;
+    min-width:150px!important;
+    max-width:260px!important;
+    width:auto!important;
+    box-sizing:border-box!important;
+    white-space:nowrap!important;
+    padding-left:18px!important;
+    padding-right:18px!important;
+  }
+
+  #page-setup .event-manager-clean .event-save-btn{
+    min-width:210px!important;
+  }
+
+  #page-setup .event-manager-clean .event-delete-btn{
+    min-width:175px!important;
+    margin:0!important;
+  }
+}
+
+/* Slightly tighter desktop widths before the phone layout breakpoint. */
+@media (min-width:901px) and (max-width:1400px){
+  #page-setup .event-manager-clean .event-clean-grid{
+    gap:8px!important;
+  }
+  #page-setup .event-manager-clean .event-mode-toggle{
+    flex-basis:250px!important;
+    width:250px!important;
+  }
+  #page-setup .event-manager-clean .event-saved-wrap{
+    min-width:260px!important;
+    flex-basis:340px!important;
+  }
+  #page-setup .event-manager-clean .event-one-row-btn{
+    min-width:130px!important;
+    padding-left:12px!important;
+    padding-right:12px!important;
+  }
+  #page-setup .event-manager-clean .event-save-btn{
+    min-width:185px!important;
+  }
+  #page-setup .event-manager-clean .event-delete-btn{
+    min-width:150px!important;
+  }
+}
+</style>
+
+<script id="nfpl-v125-stable-saved-row-script">
+function nfplV125StabilizeSavedRow(){
+  const grid=document.querySelector('#page-setup .event-manager-clean .event-clean-grid');
+  if(!grid)return;
+  grid.style.width='100%';
+  grid.style.maxWidth='100%';
+  grid.style.boxSizing='border-box';
+}
+
+/* Re-apply after every app render because older styling can reassert itself later. */
+const nfplV125OriginalRender=render;
+render=function(){
+  const result=nfplV125OriginalRender.apply(this,arguments);
+  requestAnimationFrame(nfplV125StabilizeSavedRow);
+  setTimeout(nfplV125StabilizeSavedRow,50);
+  return result;
+};
+
+window.addEventListener('resize',nfplV125StabilizeSavedRow);
+setTimeout(nfplV125StabilizeSavedRow,100);
+</script>
+
+
+
+<!-- NFPL v126 — hard-stop saved row overflow/bounce fix.
+     Keeps the five saved-board controls contained inside the blue panel on every render. -->
+<style id="nfpl-v126-saved-row-no-bounce">
+@media (min-width:901px){
+  #page-setup .event-manager-clean{
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+    padding-right:12px!important;
+  }
+
+  /* Five slots:
+     1) League/Game toggle group
+     2) Saved dropdown
+     3) Open Saved
+     4) Save League / Game
+     5) Delete Saved
+  */
+  #page-setup .event-manager-clean .event-clean-grid{
+    display:grid!important;
+    grid-template-columns: 16% 28% 14% 19% 14%!important;
+    column-gap:9px!important;
+    row-gap:0!important;
+    align-items:end!important;
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+
+  #page-setup .event-manager-clean .event-mode-toggle,
+  #page-setup .event-manager-clean .event-saved-wrap,
+  #page-setup .event-manager-clean .event-one-row-btn,
+  #page-setup .event-manager-clean .event-delete-btn{
+    min-width:0!important;
+    max-width:100%!important;
+    width:100%!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+  }
+
+  #page-setup .event-manager-clean .event-mode-toggle{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+  }
+
+  #page-setup .event-manager-clean .event-one-row-saved{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+    white-space:nowrap!important;
+    text-overflow:ellipsis!important;
+    overflow:hidden!important;
+  }
+
+  #page-setup .event-manager-clean .event-one-row-btn,
+  #page-setup .event-manager-clean .event-delete-btn,
+  #page-setup .event-manager-clean .event-mode-btn{
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    font-size:.92rem!important;
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+
+  #page-setup .event-manager-clean .event-mode-note{
+    margin-top:10px!important;
+    text-align:center!important;
+  }
+}
+
+/* Mid-size desktop/tablet widths get slightly tighter percentages to avoid right-edge overflow. */
+@media (min-width:901px) and (max-width:1500px){
+  #page-setup .event-manager-clean .event-clean-grid{
+    grid-template-columns: 15% 27% 14% 20% 14%!important;
+    column-gap:8px!important;
+  }
+  #page-setup .event-manager-clean .event-one-row-btn,
+  #page-setup .event-manager-clean .event-delete-btn,
+  #page-setup .event-manager-clean .event-mode-btn{
+    font-size:.88rem!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+}
+</style>
+
+<script id="nfpl-v126-saved-row-no-bounce-script">
+function nfplV126LockSavedRow(){
+  const panel=document.querySelector('#page-setup .event-manager-clean');
+  const grid=document.querySelector('#page-setup .event-manager-clean .event-clean-grid');
+  if(!panel || !grid) return;
+
+  panel.style.width='100%';
+  panel.style.maxWidth='100%';
+  panel.style.overflow='hidden';
+  panel.style.boxSizing='border-box';
+
+  grid.style.width='100%';
+  grid.style.maxWidth='100%';
+  grid.style.boxSizing='border-box';
+  grid.style.overflow='hidden';
+}
+
+const nfplV126OriginalRender = render;
+render = function(){
+  const result = nfplV126OriginalRender.apply(this, arguments);
+  requestAnimationFrame(nfplV126LockSavedRow);
+  setTimeout(nfplV126LockSavedRow, 50);
+  setTimeout(nfplV126LockSavedRow, 150);
+  return result;
+};
+
+window.addEventListener('resize', nfplV126LockSavedRow);
+setTimeout(nfplV126LockSavedRow, 100);
+</script>
 
 </body>
 </html>
