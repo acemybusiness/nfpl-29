@@ -20,7 +20,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#071a33">
-<title>Newfound Poker League — v119 Safe Merge Sync</title>
+<title>Newfound Poker League — v122 Delete Same Row</title>
 <style>
 :root{--navy:#071a33;--navy2:#0b2447;--panel:#102a4d;--panel2:#1b365d;--blue:#2d9cff;--orange:#ff8a00;--orange2:#ffae32;--ice:#f4f8fc;--line:#294b70;--muted:#9db6ce;--good:#29c477;--danger:#eb5b5b;--shadow:0 10px 24px rgba(0,0,0,.24)}
 *{box-sizing:border-box}html{background:#04101f}body{margin:0;background:linear-gradient(180deg,#06152a,#081b34 260px,#06152a);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#fff;min-height:100vh}button,input,select{font:inherit}button{cursor:pointer}.app{width:min(1180px,100%);margin:auto;padding:10px 10px 78px}.hero{position:relative;top:auto;z-index:2;background:rgba(7,26,51,.96);backdrop-filter:blur(12px);border:1px solid #233f61;border-radius:18px;padding:10px 12px;box-shadow:var(--shadow)}.head{display:flex;justify-content:space-between;align-items:center;gap:10px}.head h1{font-size:clamp(1.2rem,4vw,1.8rem);margin:0}.version{color:var(--orange2);font-weight:1000;font-size:.82rem}.save-pill{font-size:.7rem;color:#a9c7e4;font-weight:800}.tabs{display:flex;gap:6px;overflow:auto;padding-top:9px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{white-space:nowrap;border:1px solid #2d5178;background:#0d294c;color:#dcecff;border-radius:999px;padding:8px 12px;font-weight:900}.tab.active{background:var(--orange);color:#211406;border-color:var(--orange)}.page{display:none}.page.active{display:block}.card{background:linear-gradient(180deg,#102b4e,#0c2342);border:1px solid #274b70;border-radius:16px;padding:12px;margin-top:10px;box-shadow:0 8px 18px rgba(0,0,0,.16)}.section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}.section-title h2,.section-title h3{margin:0;font-size:1.05rem}.small{font-size:.72rem;color:var(--muted);font-weight:750}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.field{display:grid;gap:4px}.field label,.field>span{font-size:.72rem;color:#b8d0e7;font-weight:950;text-transform:uppercase;letter-spacing:.04em}.field input,.field select,input,select{width:100%;min-width:0;border:2px solid #dfe8f1;background:#f8fbff;color:#112033;border-radius:10px;padding:10px 11px;font-weight:900;outline:0}input:focus,select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,138,0,.15)}button.primary,button.secondary,button.danger,button.good{border:0;border-radius:10px;padding:10px 12px;font-weight:1000;min-height:42px}.primary{background:linear-gradient(180deg,var(--orange2),var(--orange));color:#231606;box-shadow:0 3px 0 #9a4a00}.secondary{background:#dceeff;color:#124d82}.danger{background:#ffdddd;color:#8f1f1f}.good{background:#bff4d8;color:#075f34}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.grow{flex:1}.toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%);background:#06172c;border:1px solid var(--orange);padding:10px 14px;border-radius:12px;font-weight:900;display:none;z-index:99;max-width:90vw;text-align:center}
@@ -22496,6 +22496,341 @@ syncForcePush=function(){
 
 setSyncMessage('Safe Merge Ready','good');
 </script>
+
+
+
+<!-- NFPL v120 — synced saved-event deletion only.
+     Deleted leagues/games are recorded as tombstones so another device/cloud copy
+     cannot restore them during safe merge. No standings/stat logic is changed. -->
+<script id="nfpl-v120-synced-event-delete">
+const NFPL_V120_DELETED_EVENTS_KEY='nfpl_v120_deleted_event_ids';
+
+function nfplV120DeletedEvents(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(NFPL_V120_DELETED_EVENTS_KEY)||'[]');
+    return Array.isArray(raw)?raw:[];
+  }catch(e){return []}
+}
+function nfplV120SaveDeletedEvents(ids){
+  const clean=[...new Set((ids||[]).map(String).filter(Boolean))];
+  localStorage.setItem(NFPL_V120_DELETED_EVENTS_KEY,JSON.stringify(clean));
+  return clean;
+}
+function nfplV120MarkEventDeleted(id){
+  return nfplV120SaveDeletedEvents([...nfplV120DeletedEvents(),String(id||'')]);
+}
+function nfplV120UnmarkEventDeleted(id){
+  return nfplV120SaveDeletedEvents(nfplV120DeletedEvents().filter(x=>x!==String(id||'')));
+}
+
+/* When intentionally saving/re-creating an event, clear a matching old tombstone. */
+const nfplV120OriginalSaveCurrentEvent=saveCurrentEvent;
+saveCurrentEvent=function(){
+  commitActiveField();
+  const beforeId=activeEventId();
+  const result=nfplV120OriginalSaveCurrentEvent.apply(this,arguments);
+  const afterId=activeEventId()||beforeId;
+  if(afterId)nfplV120UnmarkEventDeleted(afterId);
+  return result;
+};
+
+/* Replace delete action with a synced deletion tombstone. */
+deleteSavedEvent=function(){
+  const sel=$('savedEventSelect');
+  const id=sel?.value||'';
+  if(!id)return toast('Choose a saved League / Game first');
+
+  const list=getEventLibrary();
+  const record=list.find(x=>String(x.id)===String(id));
+  if(!record)return toast('Saved League / Game could not be found');
+
+  const kind=record.type==='game'?'game':'league';
+  if(!confirm('Delete saved '+kind+' “'+record.name+'” from BOTH laptop and phone?'))return;
+
+  nfplV120MarkEventDeleted(id);
+  setEventLibrary(list.filter(x=>String(x.id)!==String(id)));
+
+  if(String(activeEventId()||'')===String(id)){
+    state.settings.eventId='';
+    save();
+  }
+
+  render();
+  if(typeof scheduleAutoSync==='function')scheduleAutoSync();
+  toast('Saved '+kind+' deleted • sync will remove it from both devices');
+};
+
+/* Extend v119 pack with deletion tombstones. */
+const nfplV120OriginalPack=nfplV119Pack;
+nfplV119Pack=function(){
+  const pack=nfplV120OriginalPack();
+  pack.deletedEventIds=nfplV120DeletedEvents();
+  pack.appVersion='NFPL-v120';
+  return pack;
+};
+
+/* Extend v119 merge so deleted event IDs win over event-library union. */
+const nfplV120OriginalMergePacks=nfplV119MergePacks;
+nfplV119MergePacks=function(localPack,cloudPack){
+  const merged=nfplV120OriginalMergePacks(localPack,cloudPack);
+
+  const deleted=[...new Set([
+    ...(Array.isArray(localPack?.deletedEventIds)?localPack.deletedEventIds:[]),
+    ...(Array.isArray(cloudPack?.deletedEventIds)?cloudPack.deletedEventIds:[])
+  ].map(String).filter(Boolean))];
+
+  merged.deletedEventIds=deleted;
+  merged.eventLibrary=(merged.eventLibrary||[]).filter(
+    e=>!deleted.includes(String(e?.id||e?.eventId||''))
+  );
+  merged.appVersion='NFPL-v120';
+  return merged;
+};
+
+/* Persist merged deletion tombstones whenever cloud/shared data is applied. */
+const nfplV120OriginalApplyPack=nfplV119ApplyPack;
+nfplV119ApplyPack=function(pack,revision,updatedAt){
+  nfplV120SaveDeletedEvents(pack?.deletedEventIds||[]);
+  if(Array.isArray(pack?.eventLibrary)){
+    const deleted=nfplV120DeletedEvents();
+    pack.eventLibrary=pack.eventLibrary.filter(
+      e=>!deleted.includes(String(e?.id||e?.eventId||''))
+    );
+  }
+  return nfplV120OriginalApplyPack(pack,revision,updatedAt);
+};
+
+/* Also keep local library clean on startup. */
+(function(){
+  const deleted=nfplV120DeletedEvents();
+  if(!deleted.length)return;
+  const list=getEventLibrary();
+  const clean=list.filter(e=>!deleted.includes(String(e?.id||e?.eventId||'')));
+  if(clean.length!==list.length){
+    localStorage.setItem(NFPL_EVENT_LIBRARY_KEY,JSON.stringify(clean));
+  }
+})();
+
+setSyncMessage('Safe Merge + Synced Delete Ready','good');
+</script>
+
+
+
+<!-- NFPL v121 — saved-board manager + cross-device library dedupe.
+     Selecting a saved board no longer opens it.
+     Open and Delete are explicit actions.
+     Saved board libraries dedupe by event type + normalized name, with NFPL-29 canonicalized. -->
+<script id="nfpl-v121-saved-board-manager">
+const NFPL_V121_SELECTED_KEY='nfpl_v121_selected_saved_event';
+
+function nfplV121NormName(v){
+  return String(v||'').trim().replace(/\s+/g,' ').toLowerCase();
+}
+function nfplV121EventKey(e){
+  const type=e?.type==='game'?'game':'league';
+  return type+'|'+nfplV121NormName(e?.name||e?.state?.settings?.leagueName||e?.state?.settings?.eventName||'');
+}
+function nfplV121CanonicalizeEvent(e){
+  const x=JSON.parse(JSON.stringify(e||{}));
+  x.type=x.type==='game'?'game':'league';
+  x.name=String(x.name||x.state?.settings?.leagueName||x.state?.settings?.eventName||'Untitled').trim()||'Untitled';
+
+  if(x.type==='league' && nfplV121NormName(x.name)==='nfpl-29'){
+    x.id='nfpl-29-league';
+    x.name='NFPL-29';
+    if(x.state?.settings){
+      x.state.settings.eventId='nfpl-29-league';
+      x.state.settings.eventType='league';
+      x.state.settings.eventName='NFPL-29';
+      x.state.settings.leagueName='NFPL-29';
+    }
+  }
+  return x;
+}
+function nfplV121DedupeLibrary(list){
+  const byKey=new Map();
+
+  (Array.isArray(list)?list:[]).forEach(raw=>{
+    if(!raw)return;
+    const e=nfplV121CanonicalizeEvent(raw);
+    const key=nfplV121EventKey(e);
+    if(!key.endsWith('|')){
+      const old=byKey.get(key);
+      if(!old || Number(e.savedAt||0)>=Number(old.savedAt||0)) byKey.set(key,e);
+    }
+  });
+
+  return [...byKey.values()].sort((a,b)=>Number(b.savedAt||0)-Number(a.savedAt||0));
+}
+
+const nfplV121OriginalGetEventLibrary=getEventLibrary;
+getEventLibrary=function(){
+  let raw=nfplV121OriginalGetEventLibrary();
+  const clean=nfplV121DedupeLibrary(raw);
+
+  if(JSON.stringify(raw)!==JSON.stringify(clean)){
+    localStorage.setItem(NFPL_EVENT_LIBRARY_KEY,JSON.stringify(clean));
+  }
+  return clean;
+};
+
+const nfplV121OriginalSetEventLibrary=setEventLibrary;
+setEventLibrary=function(list){
+  return nfplV121OriginalSetEventLibrary(nfplV121DedupeLibrary(list));
+};
+
+function nfplV121SelectedId(){
+  return String(localStorage.getItem(NFPL_V121_SELECTED_KEY)||'');
+}
+function nfplV121SelectSaved(id){
+  localStorage.setItem(NFPL_V121_SELECTED_KEY,String(id||''));
+}
+function nfplV121OpenSelected(){
+  const sel=$('savedEventSelect');
+  const id=String(sel?.value||nfplV121SelectedId()||'');
+  if(!id)return toast('Choose a saved League / Game first');
+  nfplV121SelectSaved(id);
+  loadSavedEvent(id);
+}
+
+/* Keep dropdown selection stable without opening the event. */
+eventLibraryOptions=function(){
+  const list=getEventLibrary();
+  const selected=nfplV121SelectedId();
+
+  if(!list.length)return '<option value="">Saved</option>';
+
+  return '<option value="">Saved</option>'+list.map(x=>{
+    const label=(x.type==='game'?'Game':'League')+' • '+esc(x.name||'Untitled');
+    const sel=String(x.id)===selected?' selected':'';
+    return `<option value="${esc(x.id)}"${sel}>${label}</option>`;
+  }).join('');
+};
+
+/* Replace manager UI: select only, then explicit Open or Delete. */
+renderEventManager=function(){
+  const type=currentEventType();
+  return `<div class="event-manager event-manager-one-row event-manager-clean">
+    <div class="event-one-row-main event-clean-grid">
+      <div class="event-mode-toggle event-one-row-toggle">
+        <button type="button" class="event-mode-btn ${type==='league'?'active':''}" onclick="setEventType('league')">League</button>
+        <button type="button" class="event-mode-btn ${type==='game'?'active':''}" onclick="setEventType('game')">Game</button>
+      </div>
+
+      <label class="event-saved-wrap">
+        <span>Saved</span>
+        <select class="event-one-row-saved" id="savedEventSelect"
+          aria-label="Saved League or Game"
+          onchange="nfplV121SelectSaved(this.value)">
+          ${eventLibraryOptions()}
+        </select>
+      </label>
+
+      <button type="button" class="primary event-one-row-btn" onclick="nfplV121OpenSelected()">Open Saved</button>
+      <button type="button" class="primary event-one-row-btn event-save-btn" onclick="saveCurrentEvent()">Save League / Game</button>
+      <button type="button" class="danger event-one-row-btn event-delete-btn" onclick="deleteSavedEvent()">Delete Saved</button>
+    </div>
+
+    <div class="event-mode-note event-one-row-note">
+      ${type==='game'
+        ?'Select a saved Game to Open or Delete. Selecting it does not leave this screen.'
+        :'Select a saved League to Open or Delete. Selecting it does not leave this screen.'}
+    </div>
+  </div>`;
+};
+
+/* Ensure Delete also works from the remembered selection and clears it afterward. */
+deleteSavedEvent=function(){
+  const sel=$('savedEventSelect');
+  const id=String(sel?.value||nfplV121SelectedId()||'');
+  if(!id)return toast('Choose a saved League / Game first');
+
+  const list=getEventLibrary();
+  const record=list.find(x=>String(x.id)===id);
+  if(!record)return toast('Saved League / Game could not be found');
+
+  const kind=record.type==='game'?'game':'league';
+  if(!confirm('Delete saved '+kind+' “'+record.name+'” from BOTH laptop and phone?'))return;
+
+  nfplV120MarkEventDeleted(id);
+  setEventLibrary(list.filter(x=>String(x.id)!==id));
+  localStorage.removeItem(NFPL_V121_SELECTED_KEY);
+
+  if(String(activeEventId()||'')===id){
+    state.settings.eventId='';
+    save();
+  }
+
+  render();
+  if(typeof scheduleAutoSync==='function')scheduleAutoSync();
+  toast('Saved '+kind+' deleted • sync will remove it from both devices');
+};
+
+/* Dedupe after v120's merge. The same board name cannot survive with two device-specific IDs. */
+const nfplV121OriginalMergePacks=nfplV119MergePacks;
+nfplV119MergePacks=function(localPack,cloudPack){
+  const merged=nfplV121OriginalMergePacks(localPack,cloudPack);
+  merged.eventLibrary=nfplV121DedupeLibrary(merged.eventLibrary||[]);
+
+  /* Keep NFPL-29 tombstone handling canonical. */
+  const deleted=new Set((merged.deletedEventIds||[]).map(String));
+  merged.eventLibrary=merged.eventLibrary.filter(e=>!deleted.has(String(e.id||'')));
+
+  merged.appVersion='NFPL-v121';
+  return merged;
+};
+
+/* Dedupe every outbound sync package too, so cloud is repaired from either device. */
+const nfplV121OriginalPack=nfplV119Pack;
+nfplV119Pack=function(){
+  const pack=nfplV121OriginalPack();
+  pack.eventLibrary=nfplV121DedupeLibrary(pack.eventLibrary||[]);
+  pack.appVersion='NFPL-v121';
+  return pack;
+};
+
+/* Immediately clean this device's current library. */
+(function(){
+  const before=nfplV121OriginalGetEventLibrary();
+  const clean=nfplV121DedupeLibrary(before);
+  localStorage.setItem(NFPL_EVENT_LIBRARY_KEY,JSON.stringify(clean));
+
+  const selected=nfplV121SelectedId();
+  if(selected && !clean.some(e=>String(e.id)===selected)){
+    localStorage.removeItem(NFPL_V121_SELECTED_KEY);
+  }
+})();
+
+setSyncMessage('Saved Boards Ready • Safe Merge','good');
+</script>
+
+
+
+<!-- NFPL v122 — layout-only fix: Delete Saved stays on the same row. -->
+<style id="nfpl-v122-delete-same-row">
+.event-manager-clean .event-clean-grid{
+  display:grid!important;
+  grid-template-columns: 1fr 1fr 1.7fr 1.5fr 1.55fr 1.25fr!important;
+  gap:10px!important;
+  align-items:end!important;
+}
+.event-manager-clean .event-delete-btn{
+  grid-column:auto!important;
+  width:100%!important;
+  margin:0!important;
+}
+@media(max-width:900px){
+  .event-manager-clean .event-clean-grid{
+    grid-template-columns: repeat(6,minmax(0,1fr))!important;
+    gap:8px!important;
+  }
+  .event-manager-clean .event-one-row-btn,
+  .event-manager-clean .event-mode-btn,
+  .event-manager-clean select{
+    min-width:0!important;
+  }
+}
+</style>
 
 </body>
 </html>
