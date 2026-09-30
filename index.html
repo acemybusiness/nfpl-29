@@ -1,3 +1,49 @@
+
+every time i try to get this updated its not working
+Sam, you’ve repeatedly been told it’s being fixed, but you still don’t have a dependable app. That’s frustrating, and the updates haven’t delivered what you need.
+
+NFPL is still unfinished. The goal remains: preserve Week 3, keep each league and game separate, and let you choose Laptop or Phone for tracking—with the other device loading the same saved scores.
+
+We need to resume the actual repair and finish those checks before calling it complete. Another version number or a page that opens isn’t enough.
+
+mhmm
+Sam, I found the actual v133 code and repair package, so that work hasn’t been lost. I also confirmed the NFPL-29 Git repository hasn’t received an update since September 25.
+
+That explains part of the confusion: the repair progressed elsewhere, but it never became one verified update for both devices. The save and device-handoff checks are still unfinished.
+
+i know whats the problem with that
+The problem is that the update was left halfway applied: Apps Script was updated, but Git still serves the older app. The newer app also still had failed saves, so pushing it to Git alone wouldn’t fix everything.
+
+I also kept stopping to explain the unfinished work instead of carrying the repair through. You already authorized it—you shouldn’t have to keep asking.
+
+can you send me the full rebuild here the  index
+Sam, here’s the full recovered v133 index:
+
+JavaScript syntax checks pass. Save/sync and Laptop–Phone handoff are still unverified.
+
+
+index.html
+HTML
+ok so this is the version  that should be  on script and git
+Yes, Sam—v133 is the intended version for both Apps Script’s index and Git’s index.html.
+
+But this file is still the recovered candidate: syntax passes, while saving, sync, and Laptop/Phone handoff remain unverified. It isn’t ready to call the finished replacement yet.
+
+is this the one that has the updated version  that will  make it so that i can  pick one source for that game or league night to sync with the other.
+Yes, Sam—this v133 file includes the Laptop / Phone tracking selector intended to let you choose which device records that game or league night, with the other device receiving the saved updates.
+
+The selector is included, but the save, sync, and handoff behavior hasn’t passed verification yet. I can’t promise it works reliably in this file.
+
+ok should i start a new git and script with this one or just update the html
+Sam, keep the existing Git repository and Apps Script project so your links and saved-data connection stay together.
+
+The intended update is Git’s index.html and Apps Script’s index, along with the matching backend and cache changes. Replacing only the HTML won’t complete this repair.
+
+Hold off on replacing the live files with this candidate until its save and sync problems are resolved.
+
+
+
+
 <!DOCTYPE html>
 <!-- NFPL v96 — clean weekly print/share: name + alias, points-only default, optional BB/HH/BTY detail toggle -->
 <!-- NFPL v95 — Week 2 editable + Reaper/Steve merged + one-page readable weekly print/share -->
@@ -20,7 +66,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#071a33">
-<title>Newfound Poker League — v128 Phone Laptop Sync</title>
+<title>Newfound Poker League — v133 Device Tracking Candidate</title>
 <style>
 :root{--navy:#071a33;--navy2:#0b2447;--panel:#102a4d;--panel2:#1b365d;--blue:#2d9cff;--orange:#ff8a00;--orange2:#ffae32;--ice:#f4f8fc;--line:#294b70;--muted:#9db6ce;--good:#29c477;--danger:#eb5b5b;--shadow:0 10px 24px rgba(0,0,0,.24)}
 *{box-sizing:border-box}html{background:#04101f}body{margin:0;background:linear-gradient(180deg,#06152a,#081b34 260px,#06152a);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#fff;min-height:100vh}button,input,select{font:inherit}button{cursor:pointer}.app{width:min(1180px,100%);margin:auto;padding:10px 10px 78px}.hero{position:relative;top:auto;z-index:2;background:rgba(7,26,51,.96);backdrop-filter:blur(12px);border:1px solid #233f61;border-radius:18px;padding:10px 12px;box-shadow:var(--shadow)}.head{display:flex;justify-content:space-between;align-items:center;gap:10px}.head h1{font-size:clamp(1.2rem,4vw,1.8rem);margin:0}.version{color:var(--orange2);font-weight:1000;font-size:.82rem}.save-pill{font-size:.7rem;color:#a9c7e4;font-weight:800}.tabs{display:flex;gap:6px;overflow:auto;padding-top:9px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{white-space:nowrap;border:1px solid #2d5178;background:#0d294c;color:#dcecff;border-radius:999px;padding:8px 12px;font-weight:900}.tab.active{background:var(--orange);color:#211406;border-color:var(--orange)}.page{display:none}.page.active{display:block}.card{background:linear-gradient(180deg,#102b4e,#0c2342);border:1px solid #274b70;border-radius:16px;padding:12px;margin-top:10px;box-shadow:0 8px 18px rgba(0,0,0,.16)}.section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}.section-title h2,.section-title h3{margin:0;font-size:1.05rem}.small{font-size:.72rem;color:var(--muted);font-weight:750}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.field{display:grid;gap:4px}.field label,.field>span{font-size:.72rem;color:#b8d0e7;font-weight:950;text-transform:uppercase;letter-spacing:.04em}.field input,.field select,input,select{width:100%;min-width:0;border:2px solid #dfe8f1;background:#f8fbff;color:#112033;border-radius:10px;padding:10px 11px;font-weight:900;outline:0}input:focus,select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,138,0,.15)}button.primary,button.secondary,button.danger,button.good{border:0;border-radius:10px;padding:10px 12px;font-weight:1000;min-height:42px}.primary{background:linear-gradient(180deg,var(--orange2),var(--orange));color:#231606;box-shadow:0 3px 0 #9a4a00}.secondary{background:#dceeff;color:#124d82}.danger{background:#ffdddd;color:#8f1f1f}.good{background:#bff4d8;color:#075f34}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.grow{flex:1}.toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%);background:#06172c;border:1px solid var(--orange);padding:10px 14px;border-radius:12px;font-weight:900;display:none;z-index:99;max-width:90vw;text-align:center}
@@ -7395,7 +7441,7 @@ function enforceLockedWeek2SourceOfTruth(){
   state.weekAttendance=state.weekAttendance&&typeof state.weekAttendance==='object'?state.weekAttendance:{};
   state.weekAttendance[2]={week:2,rosterIds:registeredIds,checkedIds,absentIds,rosterSize:19,checkinTimes,locked:true,lockedAt};
 
-  const hhEntry={week:'W2',player:'SOQ',rosterPlayer:'SOQ',displayPlayer:'Angela',hand:'AAQQ',updatedAt:lockedAt,lockedAt};
+  const hhEntry={week:'W2',player:'SOQ',rosterPlayer:'SOQ',displayPlayer:'Angela',hand:'AAAQQ',updatedAt:lockedAt,lockedAt};
   state.highHands=Array.isArray(state.highHands)?state.highHands:[];
   const hhIndex=state.highHands.findIndex(h=>formatWeekLabel(h.week)==='W2');
   if(hhIndex>=0)state.highHands[hhIndex]={...state.highHands[hhIndex],...hhEntry}; else state.highHands.push(hhEntry);
@@ -16416,13 +16462,18 @@ function refreshCurrentWeekArchiveIfPresent(){
 }
 </style>
 
-<script>window.NFPL_SYNC_ENDPOINT='https://script.google.com/macros/s/AKfycbz11OfouNOUqNhDbRuSGK9ua50ag6yPNTFwGjrmLOitZccpQx8pid_xVvhw9x9tTRQE4g/exec';</script>
+<script>window.NFPL_SYNC_ENDPOINT='https://script.google.com/macros/s/AKfycbwYuwiGlXV21brSx6AftmeYp3y__3aqtsMlRbDSyEplNWcEQDKrTCj5KwMa3QvlG1HSkQ/exec';</script>
 <script id="nfpl-pv2-sync-script">
 const NFPL_SYNC_CONFIG_KEY='nfpl_pv2_sync_config';
 const NFPL_APP_VERSION='NFPL-v92';
 const NFPL_SYNC_ENDPOINT_KEY='nfpl_amb_sync_endpoint';
 function syncEndpoint(){
-  return String(localStorage.getItem(NFPL_SYNC_ENDPOINT_KEY)||window.NFPL_SYNC_ENDPOINT||'').trim();
+  let saved=String(localStorage.getItem(NFPL_SYNC_ENDPOINT_KEY)||'').trim();
+  if(saved==='https://script.google.com/macros/s/AKfycbz11OfouNOUqNhDbRuSGK9ua50ag6yPNTFwGjrmLOitZccpQx8pid_xVvhw9x9tTRQE4g/exec'){
+    saved=window.NFPL_SYNC_ENDPOINT;
+    localStorage.setItem(NFPL_SYNC_ENDPOINT_KEY,saved);
+  }
+  return String(saved||window.NFPL_SYNC_ENDPOINT||'').trim();
 }
 function setSyncEndpoint(url){
   const clean=String(url||'').trim();
@@ -20873,10 +20924,10 @@ if ('serviceWorker' in navigator) {window.addEventListener('load',()=>{navigator
   margin:14px 0 12px!important;
 }
 #livePrintPreview .standings-preview-meta span:first-child{
-  font-size:0!important;
+  font-size:.92rem!important;
 }
 #livePrintPreview .standings-preview-meta span:first-child::after{
-  content:"Stats thru Week 2"!important;
+  content:none!important;
   font-size:.92rem!important;
 }
 
@@ -20885,10 +20936,10 @@ if ('serviceWorker' in navigator) {window.addEventListener('load',()=>{navigator
   display:none!important;
 }
 
-/* Only Week 1 and Week 2 in this Week-2 print view. */
+/* Show every completed week in the share card. */
 #livePrintPreview .standings-preview-table th:nth-child(n+8),
 #livePrintPreview .standings-preview-table td:nth-child(n+8){
-  display:none!important;
+  display:table-cell!important;
 }
 
 #livePrintPreview .standings-preview-table-wrap{
@@ -21749,7 +21800,7 @@ function nfpl115HH(weekIndex,name){
   if(stored)return stored.hand||'';
   const n=String(name||'').trim().toLowerCase();
   if(weekIndex===0 && n==='s-king')return 'QQQ66';
-  if(weekIndex===1 && n==='soq')return 'AAQQ';
+  if(weekIndex===1 && n==='soq')return 'AAAQQ';
   return '';
 }
 function nfpl115WeekCell(p,weekIndex){
@@ -21852,7 +21903,7 @@ function nfpl115HH(weekIndex,name){
 
   /* permanent Week 1 / Week 2 source-of-truth HH display */
   if(weekIndex===0 && normalized==='s-king') return 'QQQ66';
-  if(weekIndex===1 && normalized==='soq') return 'AAQQ';
+  if(weekIndex===1 && normalized==='soq') return 'AAAQQ';
 
   const stored=highHandForWeekPlayer(weekIndex,raw);
   return stored?.hand||'';
@@ -23334,5 +23385,179 @@ setTimeout(nfplV126LockSavedRow, 100);
 })();
 </script>
 
+
+<style id="nfpl-v129-week3-display">
+#livePrintPreview .standings-preview-table th,#livePrintPreview .standings-preview-table td{display:table-cell!important}
+#livePrintPreview .standings-preview-table{table-layout:auto!important}
+#livePrintPreview .standings-preview-table th:nth-child(n+7),#livePrintPreview .standings-preview-table td:nth-child(n+7){width:auto!important;min-width:70px!important}
+</style>
+<script id="nfpl-v129-week3-results">
+const NFPL_WEEK3_RESULTS=[['7X',19],['Frenchie',19],['SOQ',17],['Kayla',16],['Sam',15],['Ernly',14],['LPQ',13],['Cephus',12],['Q2B',11],['Joker',10],['Matty-ICE',9],['JK47',8],['S-King',7],['Reaper',6],['All-Day',5],['Teddy',4],['B-Widow',3],['Yoda',2],['J2C',0]];
+function nfpl129Target(s){return s.settings?.eventType!=='game'&&/^(?:nfpl[ -]?29|newfound poker league)$/i.test(String(s.settings?.leagueName||'').trim())&&NFPL_WEEK3_RESULTS.every(([name])=>s.players?.some(p=>p.name===name));}
+function nfpl129Seed(s){
+ if(!nfpl129Target(s)||s._nfpl129Week3Imported)return false;
+ const now=Date.now();s.weekStandingOverrides=s.weekStandingOverrides||{};s.weekStandingOverrides[3]=Object.fromEntries(NFPL_WEEK3_RESULTS);
+ for(const p of s.players){const entry=NFPL_WEEK3_RESULTS.find(([n])=>n===p.name);if(!entry)continue;p.scores=Array.isArray(p.scores)?p.scores:[];while(p.scores.length<3)p.scores.push(null);p.scores[2]=entry[1];}
+ const hh={week:'W3',player:'Joker',rosterPlayer:'Joker',displayName:'Rich / Joker',hand:'66668',updatedAt:now,lockedAt:now};
+ s.highHands=(s.highHands||[]).filter(h=>!/^W?3$/i.test(String(h.week)));s.highHands.push(hh);s.currentHighHands={...s.currentHighHands,W3:{...hh}};
+ const rows=s.players.map(p=>{const pts=p.scores.filter(v=>v!==null&&v!==undefined&&v!=='').map(Number).filter(Number.isFinite);const drop=s.settings.dropWorst&&pts.length>1?Math.max(...pts):0;return {...p,scores:[...p.scores],drop,total:pts.reduce((a,b)=>a+b,0)-drop,checkedIn:p.scores[2]!==19,out:p.name!=='J2C'};}).sort((a,b)=>a.scores[2]-b.scores[2]||a.name.localeCompare(b.name));
+ rows.forEach((p,i)=>{p.position=i+1;p.behind=p.total-Math.min(...rows.map(r=>r.total))});
+ const winner=s.players.find(p=>p.name==='J2C');
+ s.archives=(s.archives||[]).filter(a=>Number(a.week)!==3);s.archives.unshift({week:3,name:'Week 3',date:'2026-09-28',time:now,lockedAt:now,finalizedAt:now,finalized:true,winnerId:winner.id,winnerName:'J2C',maxWeeks:3,standingsSnapshot:rows,standings:rows,highHand:hh,highHands:[...s.highHands],autoSaved:true});
+ for(const key of ['lockedWeeks','completedWeeks','hhLockedWeeks'])s[key]=[...new Set([...(s[key]||[]),3])];
+ s.currentWeek=3;s.tab='live';s.tournamentStarted=false;if(s.clock)s.clock.running=false;s._nfpl129Week3Imported=true;return true;
+}
+const nfpl129AutoSelect=autoSelectCurrentLeagueWeek;
+autoSelectCurrentLeagueWeek=function(){const show3=state._nfpl129Week3Imported&&Number(state.currentWeek)===3;nfpl129AutoSelect.apply(this,arguments);if(show3)state.currentWeek=3;};
+const nfpl129Normalize=normalize;
+normalize=function(){const value=nfpl129Normalize.apply(this,arguments);nfpl129Seed(state);return value;};
+function nfpl129DisplayWeeks(){return Math.max(2,...liveViewStandingsData().map(p=>{let i=p.scores?.length||0;while(i&&[null,undefined,''].includes(p.scores[i-1]))i--;return i;}));}
+function nfpl132PrintStandings(){return [...liveViewStandingsData()].sort((a,b)=>Number(a.total||0)-Number(b.total||0)||String(a.name||'').localeCompare(String(b.name||'')));}
+nfpl115Rows=function(){const data=nfpl132PrintStandings(),leader=Math.min(...data.map(p=>Number(p.total||0)));return data.map((p,i)=>{const lp=player(p.id)||p,alias=String(lp.alias||'').trim();return `<tr><td>${i+1}</td><td>${Number(p.total||0)-leader}</td><td class="preview-player"><div class="nfpl115-player">${carSvg(p.carColor||lp.carColor||'')}<b>${esc(p.name)}${alias?` <span class="preview-player-alias">(${esc(alias)})</span>`:''}</b></div></td><td>${Number(p.total||0)+Number(p.drop||0)}</td><td>${Number(p.drop||0)}</td><td><b>${Number(p.total||0)}</b></td>${Array.from({length:nfpl129DisplayWeeks()},(_,w)=>`<td>${nfpl115WeekCell(p,w)}</td>`).join('')}</tr>`}).join('');};
+const nfpl129Markup=buildLivePrintPreviewMarkup;
+buildLivePrintPreviewMarkup=function(){let html=nfpl129Markup.apply(this,arguments);const n=nfpl129DisplayWeeks();html=html.replace('Stats thru Week 2','Stats thru Week '+n);if(n>2)html=html.replace(/<\/tr>\s*<\/thead>/,Array.from({length:n-2},(_,i)=>`<th>Week ${i+3}<small>PTS / HH</small></th>`).join('')+'</tr></thead>');return html;};
+async function nfpl115Canvas(){
+  const cars=await nfpl115Cars();const data=nfpl132PrintStandings();const leader=Math.min(...data.map(p=>Number(p.total||0)));
+  const W=1180,top=132,hh=42,rh=40,foot=36,H=top+hh+data.length*rh+foot+14,S=2;const c=document.createElement('canvas');c.width=W*S;c.height=H*S;const x=c.getContext('2d');x.scale(S,S);x.fillStyle='#fff';x.fillRect(0,0,W,H);x.fillStyle='#07111f';x.fillRect(0,0,W,H);x.strokeStyle='#d6a640';x.lineWidth=4;x.strokeRect(3,3,W-6,H-6);x.strokeStyle='#f3d27c';x.lineWidth=1.2;x.strokeRect(14,12,W-28,82);nfpl115Text(x,'NEWFOUND POKER LEAGUE',W/2,38,900,'900 32px Georgia','#f3d27c','center');nfpl115Text(x,`Stats thru Week ${nfpl129DisplayWeeks()} • ${checkedPlayers().length} checked in • ${data.length} rostered`,W/2,73,1000,'900 18px Arial','#fff','center');
+  const X=14,Y=top,N=nfpl129DisplayWeeks(),C=[58,88,260,114,102,116,...Array(N).fill(414/N)],heads=['POS','BEHIND','PLAYER','ORIGINAL','DROPPED','TOTAL',...Array.from({length:N},(_,i)=>'WEEK '+(i+1))];x.fillStyle='#07111f';x.fillRect(X,Y,W-28,hh);x.strokeStyle='#d6a640';x.lineWidth=2;x.strokeRect(X,Y,W-28,hh);let xx=X;heads.forEach((h,i)=>{if(i){x.beginPath();x.moveTo(xx,Y);x.lineTo(xx,Y+hh);x.stroke()}if(i>=6){nfpl115Text(x,h,xx+C[i]/2,Y+14,C[i]-6,'900 14px Arial','#f3d27c','center');nfpl115Text(x,'PTS / HH',xx+C[i]/2,Y+30,C[i]-6,'900 11px Arial','#ffe6a2','center')}else nfpl115Text(x,h,xx+C[i]/2,Y+hh/2,C[i]-6,'900 14px Arial','#f3d27c','center');xx+=C[i]});
+  for(let r=0;r<data.length;r++){const p=data[r],lp=player(p.id)||p,ry=Y+hh+r*rh;x.fillStyle=r%2?'#fff8e8':'#f8fbff';x.fillRect(X,ry,W-28,rh);x.strokeStyle='#9eacbc';x.lineWidth=1;x.beginPath();x.moveTo(X,ry+rh);x.lineTo(W-14,ry+rh);x.stroke();let q=X;const original=Number(p.total||0)+Number(p.drop||0);const vals=[r+1,Number(p.total||0)-leader,'',original,Number(p.drop||0),Number(p.total||0),'',''];for(let i=0;i<C.length;i++){if(i){x.beginPath();x.moveTo(q,ry);x.lineTo(q,ry+rh);x.stroke()}if(i===2){nfpl115DrawCar(x,cars,p.carColor||lp.carColor||'#f97316',q+5,ry+4,32,32);const al=String(lp.alias||'').trim();nfpl115Text(x,`${p.name}${al?` (${al})`:''}`,q+42,ry+rh/2,C[i]-48,'900 17px Arial','#132033','left')}else if(i>=6){const wi=i-6,pts=(p.scores&&p.scores[wi]!=null)?p.scores[wi]:'',hand=nfpl115HH(wi,p.name);nfpl115Text(x,pts,q+C[i]/2,ry+(hand?12:rh/2),C[i]-8,'900 18px Arial','#132033','center');if(hand){const label='HH • '+hand;x.font='900 12px Arial';const bw=Math.min(C[i]-12,Math.max(88,x.measureText(label).width+18)),bx=q+(C[i]-bw)/2,by=ry+22;x.fillStyle='#fff1bf';x.beginPath();x.roundRect?x.roundRect(bx,by,bw,16,8):x.rect(bx,by,bw,16);x.fill();x.strokeStyle='#bd8c24';x.stroke();nfpl115Text(x,label,q+C[i]/2,by+8,bw-8,'900 12px Arial','#5b3900','center')}}else nfpl115Text(x,vals[i],q+C[i]/2,ry+rh/2,C[i]-8,'900 18px Arial','#132033','center');q+=C[i]}}
+  x.strokeStyle='#d6a640';x.lineWidth=2;x.strokeRect(X,Y,W-28,hh+data.length*rh);const fy=Y+hh+data.length*rh;x.fillStyle='#050d18';x.fillRect(0,fy+1,W,foot+13);x.strokeStyle='#d6a640';x.beginPath();x.moveTo(0,fy+1);x.lineTo(W,fy+1);x.stroke();nfpl115Text(x,'© 2026 SRL',W/2,fy+19,300,'900 12px Georgia','#f3d27c','center');return c;
+}
+// Persist the candidate import locally. Existing cloud synchronization is unchanged.
+normalize();localStorage.setItem(KEY,JSON.stringify(state));render();
+</script>
+
+<style id="nfpl-v131-readable-share">
+#livePrintPreview .standings-preview-meta{justify-content:center!important;gap:10px!important;color:#fff!important;flex-wrap:wrap!important;text-align:center!important;width:100%!important}
+#livePrintPreview .standings-preview-meta span,#livePrintPreview .standings-preview-meta span:first-child{font-size:18px!important;color:#fff!important}
+#livePrintPreview .standings-preview-meta span:first-child::after{content:none!important}
+#livePrintPreview .standings-preview-table{table-layout:fixed!important}
+#livePrintPreview .standings-preview-table th,#livePrintPreview .standings-preview-table td{padding:9px 5px!important;line-height:1.15!important;font-size:18px!important}
+#livePrintPreview .standings-preview-table th{font-size:16px!important}
+#livePrintPreview .standings-preview-table th small{font-size:12px!important;margin-top:4px!important}
+#livePrintPreview .standings-preview-table th:nth-child(1),#livePrintPreview .standings-preview-table td:nth-child(1){width:5%!important}
+#livePrintPreview .standings-preview-table th:nth-child(2),#livePrintPreview .standings-preview-table td:nth-child(2){width:7.5%!important}
+#livePrintPreview .standings-preview-table th:nth-child(3),#livePrintPreview .standings-preview-table td:nth-child(3){width:22%!important}
+#livePrintPreview .standings-preview-table th:nth-child(4),#livePrintPreview .standings-preview-table td:nth-child(4){width:9.5%!important}
+#livePrintPreview .standings-preview-table th:nth-child(5),#livePrintPreview .standings-preview-table td:nth-child(5){width:8.5%!important}
+#livePrintPreview .standings-preview-table th:nth-child(6),#livePrintPreview .standings-preview-table td:nth-child(6){width:10%!important}
+#livePrintPreview .standings-preview-table th:nth-child(n+7),#livePrintPreview .standings-preview-table td:nth-child(n+7){width:auto!important;min-width:0!important}
+#livePrintPreview .nfpl115-player b{font-size:18px!important;white-space:normal!important;overflow-wrap:anywhere!important}
+#livePrintPreview .nfpl115-hh{font-size:14px!important;line-height:1.1!important;padding:3px 5px!important}
+@media print{
+ #livePrintPreview .standings-preview-table th,#livePrintPreview .standings-preview-table td{font-size:10pt!important;padding:4pt 2pt!important}
+ #livePrintPreview .standings-preview-table th small{font-size:7pt!important}
+ #livePrintPreview .nfpl115-player b{font-size:10pt!important}
+ #livePrintPreview .nfpl115-hh{font-size:8pt!important}
+ #livePrintPreview .standings-preview-meta span,#livePrintPreview .standings-preview-meta span:first-child{font-size:11pt!important}
+}
+</style>
+<style id="nfpl133-device-layout">.nfpl133-role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}.nfpl133-role-grid label{font-weight:800;font-size:.85rem;min-width:0}.nfpl133-role-grid select{margin-top:5px}.nfpl133-role-panel small{display:block;margin-top:9px;color:#b8d0e7;line-height:1.4}#nfpl133Status{margin:10px 0;color:#ffe09a;font-weight:800;overflow-wrap:anywhere}.nfpl133-role-panel .row{gap:8px}.nfpl133-role-panel .row button{flex:1;min-width:140px}@media(max-width:520px){.nfpl133-role-grid{grid-template-columns:1fr 1fr;gap:7px}.nfpl133-role-panel{padding:10px!important}.nfpl133-role-panel .row button{min-width:120px;font-size:.78rem}}</style>
+<script id="nfpl133-device-ownership">
+const NFPL133_PROTOCOL='nfpl-owner-v1';
+const NFPL133_STORE='nfpl133_device_roles';
+function nfpl133Stored(){try{return JSON.parse(localStorage.getItem(NFPL133_STORE)||'{}')}catch(e){return {}}}
+let nfpl133={...{deviceType:'',tokens:{},queues:{},owners:{},capable:false,lastStatus:'Checking connection…'},...nfpl133Stored(),busy:false,authoritative:null};
+// Capability must be freshly acknowledged by the configured endpoint each session.
+nfpl133.capable=false;
+function nfpl133Persist(){localStorage.setItem(NFPL133_STORE,JSON.stringify({deviceType:nfpl133.deviceType,tokens:nfpl133.tokens,queues:nfpl133.queues,owners:nfpl133.owners,queueSeq:nfpl133.queueSeq||0,lastStatus:nfpl133.lastStatus}));}
+function nfpl133EventId(){return String(state.settings?.eventId||activeEventId()||'');}
+function nfpl133GameKey(){return nfpl133EventId()+':'+Math.max(1,Number(state.currentWeek||1));}
+function nfpl133Owner(){return nfpl133.owners[nfpl133GameKey()]||null;}
+function nfpl133IsOwner(){const key=nfpl133GameKey(),owner=nfpl133Owner();return !!(owner&&owner.deviceId===nfplSync.deviceId&&nfpl133.tokens[key]);}
+function nfpl133CanEdit(){const owner=nfpl133Owner();if(owner)return nfpl133IsOwner();return nfpl133.capable&&!state.tournamentStarted;}
+function nfpl133Note(text){nfpl133.lastStatus=text;nfpl133Persist();const el=document.getElementById('nfpl133Status');if(el)el.textContent=text;}
+async function nfpl133Request(body){
+ body={protocol:NFPL133_PROTOCOL,linkId:nfplSync.linkId,deviceId:nfplSync.deviceId,deviceType:String(nfpl133.deviceType).toLowerCase(),...body};
+ if(window.google&&google.script&&google.script.run)return new Promise((resolve,reject)=>google.script.run.withSuccessHandler(resolve).withFailureHandler(reject).nfpl133Request(body));
+ const endpoint=syncEndpoint();if(!endpoint)throw new Error('Connection not configured');
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);
+ try{const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),redirect:'follow',signal:controller.signal});const result=JSON.parse(await response.text());return result;}finally{clearTimeout(timer)}
+}
+function nfpl133RememberOwner(key,result){if(result.owner)nfpl133.owners[key]=result.owner;else delete nfpl133.owners[key];nfpl133Persist();}
+function nfpl133Queue(){const key=nfpl133GameKey();if(!nfpl133EventId())return;const pack=nfplV119Pack();nfpl133.queues[key]={gameKey:key,pack,version:(nfpl133.queueSeq=(nfpl133.queueSeq||0)+1),token:nfpl133.tokens[key]||'',deviceId:nfplSync.deviceId,savedAt:Date.now()};nfpl133Persist();nfpl133Note('Saved on this device • waiting to upload');}
+function nfpl133Apply(pack,revision,updatedAt){
+ const wanted=nfpl133EventId(),tab=state.tab;const own=nfpl133IsOwner();if(!own&&state.clock)state.clock.running=false;
+ nfplV119ApplyPack(pack,revision,updatedAt);
+ if(wanted&&String(state.settings?.eventId||'')!==wanted){const saved=(pack.eventLibrary||[]).find(r=>String(r.id)===wanted);if(saved?.state){state=deepMerge(defaultState(),saved.state);state.tab=tab;normalize();localStorage.setItem(KEY,JSON.stringify(state));render();}}
+ nfpl133.authoritative=JSON.parse(JSON.stringify(state));
+}
+function nfpl133ScopedPack(cloud,queued){
+ const eventId=queued.gameKey.replace(/:\d+$/,'');const local=queued.pack;const mine=(local.eventLibrary||[]).find(r=>String(r.id)===eventId)||{id:eventId,name:local.state?.settings?.leagueName,type:local.state?.settings?.eventType,state:local.state};
+ // The active state is newer than an event-library snapshot produced before save().
+ if(String(local.state?.settings?.eventId||'')===eventId)mine.state=local.state;
+ const merged=JSON.parse(JSON.stringify(cloud||{}));merged.eventLibrary=Array.isArray(merged.eventLibrary)?merged.eventLibrary:[];
+ const index=merged.eventLibrary.findIndex(r=>String(r.id)===eventId);if(index<0)merged.eventLibrary.push(mine);else merged.eventLibrary[index]=mine;
+ merged.state=mine.state;
+ merged.appVersion='NFPL-v133';merged.syncMeta=local.syncMeta;return merged;
+}
+async function nfpl133Flush(key=nfpl133GameKey()){
+ if(nfpl133.busy||!nfpl133.capable)return false;const queued=nfpl133.queues[key];if(!queued)return true;
+ nfpl133.busy=true;try{
+  const status=await nfpl133Request({action:'status',gameKey:key});if(!status.ok)throw new Error(status.message||'Connection update required');nfpl133RememberOwner(key,status);
+  if(status.owner&&(status.owner.deviceId!==nfplSync.deviceId||queued.token!==nfpl133.tokens[key])){nfpl133Note('This device has saved changes. Tracking belongs to '+status.owner.deviceType+'.');return false;}
+  const pulled=await nfpl133Request({action:'pull'});if(!pulled.ok)throw new Error('Could not read shared game');
+  const cloud=pulled.found?JSON.parse(pulled.payload):{};const merged=nfpl133ScopedPack(cloud,queued);
+  const result=await nfpl133Request({action:'push',gameKey:key,baseRevision:Number(pulled.revision||0),payloadJson:JSON.stringify(merged),roleTokens:{[key]:queued.token},force:false});
+  if(!result.ok){nfpl133Note(['not_owner','owner_required','ownership_revoked','other_week_owned'].includes(result.code||result.error)?'Tracking is on the other device • saved changes kept here':result.conflict?'Shared game changed • upload will retry':'Upload pending • '+(result.message||'retry when connected'));return false;}
+  // Do not delete changes saved while this request was in flight.
+  if(nfpl133.queues[key]?.version===queued.version){delete nfpl133.queues[key];nfpl133Persist();}
+  nfplSync.revision=Number(result.revision||0);nfplSync.lastCloudAt=result.updatedAt||'';saveSyncConfig();nfpl133Note(nfpl133.queues[key]?'New changes waiting to upload':'Synced • both devices can view and print');return !nfpl133.queues[key];
+ }catch(e){nfpl133Note('Saved on this device • upload when connected');return false;}finally{nfpl133.busy=false;}
+}
+async function nfpl133Pull(){
+ if(nfpl133.busy)return;nfpl133.busy=true;try{
+  const capability=await nfpl133Request({action:'capabilities'});
+  if(!capability.ok||capability.protocol!==NFPL133_PROTOCOL){nfpl133.capable=false;nfpl133Note('Connection update needed • viewing saved results');return;}
+  nfpl133.capable=true;const key=nfpl133GameKey();
+  const status=await nfpl133Request({action:'status',gameKey:key});if(!status.ok)throw new Error('Could not check tracking device');nfpl133RememberOwner(key,status);
+  const result=await nfpl133Request({action:'pull'});if(!result.ok)throw new Error('Could not read game');
+  if(result.found&&(!nfpl133.queues[key]||(nfpl133Owner()&&nfpl133Owner().deviceId!==nfplSync.deviceId)))nfpl133Apply(JSON.parse(result.payload),Number(result.revision||0),result.updatedAt||'');
+  else {nfplSync.revision=Number(result.revision||0);saveSyncConfig();}
+  nfpl133Note(nfpl133IsOwner()?'Tracking on this '+nfpl133.deviceType:nfpl133Owner()?'View / print • tracking on '+nfpl133Owner().deviceType:'Choose your setup device, then choose the tracking device at game start');
+ }catch(e){nfpl133Note(nfpl133IsOwner()?'Saved locally • upload when connected':'Offline • viewing saved results');}finally{nfpl133.busy=false;render();}
+ await nfpl133Flush();
+}
+async function nfpl133ChooseSetup(type){if(!['Phone','Laptop'].includes(type))return;nfpl133.deviceType=type;nfpl133Persist();await nfpl133Pull();}
+function nfpl133SetTracking(type){if(!['Phone','Laptop'].includes(type))return;if(!nfpl133CanEdit())return toast('Only the tracking device can change this game');state.settings.trackingDeviceType133=type;save();render();}
+async function nfpl133Claim(startAfter=false){
+ const selected=state.settings.trackingDeviceType133||'';if(!selected)return toast('Choose Phone or Laptop for tracking');
+ if(nfpl133.deviceType!==selected)return toast('Open this game on the selected '+selected+' and choose its setup device');
+ if(!nfpl133.capable){await nfpl133Pull();if(!nfpl133.capable)return;}
+ if(nfpl133IsOwner()){if(startAfter&&!state.tournamentStarted)nfpl133OriginalStart();return;}
+ const existing=await nfpl133Request({action:'status',gameKey:nfpl133GameKey()});nfpl133RememberOwner(nfpl133GameKey(),existing);if(existing.owner&&existing.owner.deviceId!==nfplSync.deviceId)return nfpl133Note('View / print • tracking on '+existing.owner.deviceType);
+ nfpl133Queue();if(!await nfpl133Flush())return toast('Upload the saved setup before starting tracking');
+ try{const result=await nfpl133Request({action:'claim',gameKey:nfpl133GameKey(),baseRevision:Number(nfplSync.revision||0)});if(!result.ok)return nfpl133Note(result.message||'Another device is tracking this game');nfpl133.tokens[nfpl133GameKey()]=result.token;nfpl133RememberOwner(nfpl133GameKey(),result);nfpl133Persist();nfpl133Note('Tracking on this '+selected);if(startAfter&&!state.tournamentStarted)nfpl133OriginalStart();render();}catch(e){nfpl133Note('Connect to claim tracking before starting');}
+}
+async function nfpl133Handoff(){
+ if(!nfpl133IsOwner())return toast('Handoff starts on the current tracking device');
+ if(!confirm('Upload this game, then release tracking so the other device can take over?'))return;
+ const key=nfpl133GameKey();state.settings.trackingDeviceType133=nfpl133.deviceType==='Phone'?'Laptop':'Phone';save();nfpl133Queue();if(!await nfpl133Flush(key))return nfpl133Note('Handoff paused • upload pending changes first');
+ try{const result=await nfpl133Request({action:'release',gameKey:key,baseRevision:Number(nfplSync.revision||0),roleTokens:{[key]:nfpl133.tokens[key]},nextDeviceType:nfpl133.deviceType==='Phone'?'Laptop':'Phone'});if(!result.ok)return nfpl133Note(result.message||'Handoff paused • sync again');delete nfpl133.tokens[key];nfpl133RememberOwner(key,result);nfpl133Note('Tracking released • choose tracking on the other device');render();}catch(e){nfpl133Note('Handoff paused • connection needed');}
+}
+function nfpl133Panel(){const owner=nfpl133Owner(),type=state.settings.trackingDeviceType133||'';return `<div class="card nfpl133-role-panel"><b>Setup and tracking devices</b><div class="nfpl133-role-grid"><label>Set up on<select data-nfpl133-safe onchange="nfpl133ChooseSetup(this.value)"><option value="">Choose this device</option>${['Phone','Laptop'].map(t=>`<option ${nfpl133.deviceType===t?'selected':''}>${t}</option>`).join('')}</select></label><label>Track this game on<select onchange="nfpl133SetTracking(this.value)"><option value="">Choose at game start</option>${['Phone','Laptop'].map(t=>`<option ${type===t?'selected':''}>${t}</option>`).join('')}</select></label></div><div id="nfpl133Status" role="status">${esc(nfpl133.lastStatus)}</div><div class="row"><button class="primary" data-nfpl133-safe onclick="nfpl133Claim(true)" ${owner&&owner.deviceId!==nfplSync.deviceId?'disabled':''}>${owner?'Tracking: '+esc(owner.deviceType):'Confirm tracking and start'}</button><button class="secondary" data-nfpl133-safe onclick="nfpl133Pull()">Refresh shared results</button>${nfpl133IsOwner()?'<button class="secondary" data-nfpl133-safe onclick="nfpl133Handoff()">Hand off tracking</button>':''}</div><small>The tracking device records play. Both devices can view results and share / print. Offline tracking changes stay on the tracking device until uploaded.</small></div>`;}
+const nfpl133OriginalStart=startTournament;
+startTournament=function(){return nfpl133Claim(true);};
+const nfpl133OriginalClock=startClock;
+startClock=function(){if(!nfpl133IsOwner())return toast('Confirm the tracking device before starting the clock');return nfpl133OriginalClock.apply(this,arguments);};
+const nfpl133OriginalSetup=renderSetup;
+renderSetup=function(){return nfpl133Panel()+nfpl133OriginalSetup.apply(this,arguments);};
+const nfpl133OriginalSave=save;
+save=function(){if(nfpl133.navigating){localStorage.setItem(KEY,JSON.stringify(state));return;}if(!nfpl133CanEdit()){if(nfpl133.authoritative){const tab=state.tab;state=JSON.parse(JSON.stringify(nfpl133.authoritative));state.tab=tab;render();}return;}const value=nfpl133OriginalSave.apply(this,arguments);nfpl133.authoritative=JSON.parse(JSON.stringify(state));nfpl133Queue();return value;};
+// One transport gate closes legacy merge/force-push paths as well as normal Sync.
+cloudCall=function(name,args,ok,err){if(name==='nfplSyncPush'){const result={ok:false,code:'use_owner_protocol',message:'Use the selected tracking device'};if(ok)ok(result);return;}nfpl133Request({action:'pull'}).then(ok).catch(err||(()=>{}));};
+scheduleAutoSync=function(){clearTimeout(nfplAutoTimer);nfplAutoTimer=setTimeout(()=>nfpl133Flush(),1200);};
+syncPush=function(){return nfpl133Flush();};syncPull=function(){return nfpl133Pull();};syncNow=function(){return nfpl133Pull();};syncForcePush=function(){return nfpl133Flush();};
+function nfpl133AllowedControl(el){const action=String(el.getAttribute('onclick')||el.getAttribute('onchange')||'').replace(/^event\.stopPropagation\(\);\s*/, '');return el.hasAttribute('data-nfpl133-safe')||/^(?:showTab|openLivePrintPreview|closeLivePrintPreview|nfpl115[A-Za-z]*|printLive[A-Za-z]*|printStandings[A-Za-z]*|download[A-Za-z]*|backupJSON|openWeekArchive|openArchiveByIndex|closeWeekArchive|printWeekArchive|setTableViewMode|setStandingsWeek|selectSavedEvent|loadSavedEvent|openSavedEvent|nfplV121SelectSaved|nfplV121OpenSelected|syncNow|syncPull)\b/.test(action)||el.closest('.standings-preview-actions,.nfpl115-png-modal,.tabs,.bottom-nav');}
+function nfpl133Capture(event){const el=event.target.closest('button,input,select,a');if(!el||nfpl133CanEdit()||nfpl133AllowedControl(el))return;event.preventDefault();event.stopImmediatePropagation();toast('View / print on this device • tracking changes belong to the selected device');}
+for(const eventName of ['click','change','input','submit'])document.addEventListener(eventName,nfpl133Capture,true);
+// Switching saved games and browsing past weeks are local navigation, never queued writes.
+for(const name of ['loadSavedEvent','setStandingsWeek']){const original=window[name];if(typeof original==='function')window[name]=function(){nfpl133.navigating=true;try{return original.apply(this,arguments)}finally{nfpl133.navigating=false;nfpl133.authoritative=JSON.parse(JSON.stringify(state));nfpl133Pull();}};}
+const nfpl133OriginalRender=render;
+render=function(){const result=nfpl133OriginalRender.apply(this,arguments);for(const el of document.querySelectorAll('#pages input,#pages select,#pages button')){if(!nfpl133CanEdit()&&!nfpl133AllowedControl(el)){el.disabled=true;el.setAttribute('aria-disabled','true');}}return result;};
+nfpl133.authoritative=JSON.parse(JSON.stringify(state));render();
+window.addEventListener('online',()=>nfpl133Pull());setTimeout(()=>nfpl133Pull(),800);
+
+</script>
 </body>
 </html>
