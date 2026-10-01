@@ -1,49 +1,3 @@
-
-every time i try to get this updated its not working
-Sam, you’ve repeatedly been told it’s being fixed, but you still don’t have a dependable app. That’s frustrating, and the updates haven’t delivered what you need.
-
-NFPL is still unfinished. The goal remains: preserve Week 3, keep each league and game separate, and let you choose Laptop or Phone for tracking—with the other device loading the same saved scores.
-
-We need to resume the actual repair and finish those checks before calling it complete. Another version number or a page that opens isn’t enough.
-
-mhmm
-Sam, I found the actual v133 code and repair package, so that work hasn’t been lost. I also confirmed the NFPL-29 Git repository hasn’t received an update since September 25.
-
-That explains part of the confusion: the repair progressed elsewhere, but it never became one verified update for both devices. The save and device-handoff checks are still unfinished.
-
-i know whats the problem with that
-The problem is that the update was left halfway applied: Apps Script was updated, but Git still serves the older app. The newer app also still had failed saves, so pushing it to Git alone wouldn’t fix everything.
-
-I also kept stopping to explain the unfinished work instead of carrying the repair through. You already authorized it—you shouldn’t have to keep asking.
-
-can you send me the full rebuild here the  index
-Sam, here’s the full recovered v133 index:
-
-JavaScript syntax checks pass. Save/sync and Laptop–Phone handoff are still unverified.
-
-
-index.html
-HTML
-ok so this is the version  that should be  on script and git
-Yes, Sam—v133 is the intended version for both Apps Script’s index and Git’s index.html.
-
-But this file is still the recovered candidate: syntax passes, while saving, sync, and Laptop/Phone handoff remain unverified. It isn’t ready to call the finished replacement yet.
-
-is this the one that has the updated version  that will  make it so that i can  pick one source for that game or league night to sync with the other.
-Yes, Sam—this v133 file includes the Laptop / Phone tracking selector intended to let you choose which device records that game or league night, with the other device receiving the saved updates.
-
-The selector is included, but the save, sync, and handoff behavior hasn’t passed verification yet. I can’t promise it works reliably in this file.
-
-ok should i start a new git and script with this one or just update the html
-Sam, keep the existing Git repository and Apps Script project so your links and saved-data connection stay together.
-
-The intended update is Git’s index.html and Apps Script’s index, along with the matching backend and cache changes. Replacing only the HTML won’t complete this repair.
-
-Hold off on replacing the live files with this candidate until its save and sync problems are resolved.
-
-
-
-
 <!DOCTYPE html>
 <!-- NFPL v96 — clean weekly print/share: name + alias, points-only default, optional BB/HH/BTY detail toggle -->
 <!-- NFPL v95 — Week 2 editable + Reaper/Steve merged + one-page readable weekly print/share -->
@@ -10076,109 +10030,28 @@ function completeKnockout(result){
 function confirmKnockout(killerId){selectKnockoutKiller(killerId)}
 function liveViewStandingsData(){
   const week=Math.max(1,Number(state.currentWeek||1));
-  const idx=week-1;
   const archived=archiveForWeek(week);
-  const currentWeekFinalized=!!(archived&&(archived.finalized||(state.lockedWeeks||[]).includes(week)));
-
-  // A finalized week is read-only. Never let current check-in state clear or reorder it.
-  if(!currentWeekFinalized)refreshCurrentWeekRosterPoints();
-
-  // If this week is finalized, sort the archived snapshot by THIS WEEK'S points,
-  // lowest score first. This keeps the winner (0) in 1st place.
-  if(currentWeekFinalized){
-    const rows=archiveRowsForView(archived);
-    if(rows.length){
-      const mapped=rows.map((r,i)=>({
-        ...r,
-        id:r.id||state.players.find(p=>p.name===r.name)?.id||'',
-        carColor:r.carColor||state.players.find(p=>p.name===r.name)?.carColor||'',
-        checkedIn:r.checkedIn!==false,
-        out:!!r.out,
-        total:Number(r.total||0),
-        drop:Number(r.drop||0),
-        _archivePosition:Number(r.position||i+1),
-        _archiveBehind:Number(r.behind||0),
-        _archivedWeek:week
-      }));
-
-      // Week 1 has a verified, locked finishing order supplied by Sam.
-      // Use it as the position authority even if older saved data was alphabetical.
-      if(week===1){
-        const order=new Map(NFPL_LOCKED_WEEK1_RESULTS.map(([name],i)=>[name,i]));
-        return mapped.map(row=>{
-          const point=lockedWeek1Point(row.name);
-          const scores=Array.isArray(row.scores)?[...row.scores]:[];
-          if(point!==null)scores[0]=point;
-          return point===null?row:{...row,scores,drop:0,total:point,_archivePosition:(order.get(row.name)??998)+1,_archiveBehind:point};
-        }).sort((a,b)=>(order.get(a.name)??999)-(order.get(b.name)??999));
-      }
-
-      return mapped.sort((a,b)=>{
-        const ap=Array.isArray(a.scores)?a.scores[idx]:null;
-        const bp=Array.isArray(b.scores)?b.scores[idx]:null;
-        const av=(ap===null||ap===undefined||ap==='')?Number.POSITIVE_INFINITY:Number(ap);
-        const bv=(bp===null||bp===undefined||bp==='')?Number.POSITIVE_INFINITY:Number(bp);
-        return av-bv||Number(a.total||0)-Number(b.total||0)||String(a.name||'').localeCompare(String(b.name||''));
-      });
-    }
-  }
-
-  const rows=standings();
-
-  // Between completed weeks, keep the internal Standings screen in the
-  // verified cumulative order until check-in for the next week begins.
-  // Without this guard, an empty new week makes every player an absentee
-  // and the live sorter incorrectly falls back to alphabetical roster order.
-  if(!state.tournamentStarted&&checkedPlayers().length===0){
-    const lockedOrder=new Map(NFPL_LOCKED_WEEK1_RESULTS.map(([name],i)=>[name,i]));
-    return rows.sort((a,b)=>
-      Number(a.total||0)-Number(b.total||0)||
-      (lockedOrder.get(a.name)??999)-(lockedOrder.get(b.name)??999)||
-      String(a.name||'').localeCompare(String(b.name||''))
-    );
-  }
-
-  const info=currentWeekPlaceRows();
-  const scoreById=info.scoreById;
-  const outIndex=new Map(info.outIds.map((id,i)=>[id,i]));
-
-  return rows.sort((a,b)=>{
-    const pa=player(a.id)||a, pb=player(b.id)||b;
-
-    // Still-live checked-in players stay above anyone already out or absent.
-    const aLive=!!pa.checkedIn&&!pa.out;
-    const bLive=!!pb.checkedIn&&!pb.out;
-    if(aLive!==bLive)return aLive?-1:1;
-
-    // Eliminated checked-in players come next, using current-week points:
-    // lower points rank higher, so later outs climb upward from the bottom.
-    const aOut=!!pa.checkedIn&&!!pa.out;
-    const bOut=!!pb.checkedIn&&!!pb.out;
-    if(aOut!==bOut)return aOut?-1:1;
-
-    // Absentees stay at the bottom.
-    const aAbsent=!pa.checkedIn;
-    const bAbsent=!pb.checkedIn;
-    if(aAbsent!==bAbsent)return aAbsent?1:-1;
-
-    const as=scoreById.has(pa.id)?Number(scoreById.get(pa.id)):Number.POSITIVE_INFINITY;
-    const bs=scoreById.has(pb.id)?Number(scoreById.get(pb.id)):Number.POSITIVE_INFINITY;
-    if(as!==bs)return as-bs;
-
-    // Among still-live players whose weekly finishing score is not known yet,
-    // keep the lower season total first as a stable tiebreaker.
-    if(aLive&&bLive){
-      const t=Number(a.total||0)-Number(b.total||0);
-      if(t)return t;
-    }
-
-    // Stable elimination-order tiebreaker when needed.
-    const ao=outIndex.has(pa.id)?outIndex.get(pa.id):Number.POSITIVE_INFINITY;
-    const bo=outIndex.has(pb.id)?outIndex.get(pb.id):Number.POSITIVE_INFINITY;
-    if(ao!==bo)return bo-ao;
-
-    return String(a.name||'').localeCompare(String(b.name||''));
+  const finalized=!!(archived&&(archived.finalized||(state.lockedWeeks||[]).includes(week)));
+  if(!finalized)refreshCurrentWeekRosterPoints();
+  let rows=finalized?archiveRowsForView(archived).map(r=>({
+    ...r,id:r.id||state.players.find(p=>p.name===r.name)?.id||'',
+    carColor:r.carColor||state.players.find(p=>p.name===r.name)?.carColor||'',
+    checkedIn:r.checkedIn!==false,out:!!r.out,total:Number(r.total||0),
+    drop:Number(r.drop||0),_archivedWeek:week
+  })):standings();
+  if(!rows.length)rows=standings();
+  if(finalized&&week===1)rows=rows.map(r=>{
+    const points=lockedWeek1Point(r.name);
+    if(points===null)return r;
+    const scores=Array.isArray(r.scores)?[...r.scores]:[];scores[0]=points;
+    return {...r,scores,drop:0,total:points};
   });
+  // Behind is total minus the leader's total, so ascending total is ascending Behind.
+  rows=[...rows].sort((a,b)=>Number(a.total||0)-Number(b.total||0)||
+    String(a.name||'').localeCompare(String(b.name||'')));
+  const leader=rows.length?Number(rows[0].total||0):0;
+  return rows.map((r,i)=>({...r,position:i+1,behind:Number(r.total||0)-leader,
+    _archivePosition:i+1,_archiveBehind:Number(r.total||0)-leader}));
 }
 function archiveWeekNumber(a){if(Number(a?.week)>0)return Number(a.week);const m=String(a?.name||'').match(/(?:week|w)\s*#?\s*(\d+)/i);return m?Number(m[1]):0}
 function archiveForWeek(week){const w=Number(week);return state.archives.find(a=>archiveWeekNumber(a)===w)||null}
@@ -10261,7 +10134,7 @@ function liveNoteForPlayer(p){if(!p.checkedIn)return 'Not checked in';if(p.out&&
 function buildLiveStandingsRows(preview=false,weekLimit=null,previewExtrasWeek=0){
   const visibleWeeks=preview&&Number(weekLimit)>0?Math.min(maxWeeks(),Math.max(1,Number(weekLimit))):maxWeeks();
   const data=liveViewStandingsData(),archivedView=currentWeekArchiveFinalized();
-  const leaderTotal=Math.min(...data.map(p=>Number(p.total||0)),0);
+  const leaderTotal=data.length?Math.min(...data.map(p=>Number(p.total||0))):0;
   const m=state.settings.money||{};
   const rebuyEnabled=Number(m.rebuy||0)>0||Number(m.rebuyChips||0)>0;
   const addonEnabled=Number(m.addonCount||0)>0;
