@@ -20,7 +20,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#071a33">
-<title>Newfound Poker League — v133 Device Tracking Candidate</title>
+<title>Newfound Poker League — v133.1 Sync Repair Candidate</title>
 <style>
 :root{--navy:#071a33;--navy2:#0b2447;--panel:#102a4d;--panel2:#1b365d;--blue:#2d9cff;--orange:#ff8a00;--orange2:#ffae32;--ice:#f4f8fc;--line:#294b70;--muted:#9db6ce;--good:#29c477;--danger:#eb5b5b;--shadow:0 10px 24px rgba(0,0,0,.24)}
 *{box-sizing:border-box}html{background:#04101f}body{margin:0;background:linear-gradient(180deg,#06152a,#081b34 260px,#06152a);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:#fff;min-height:100vh}button,input,select{font:inherit}button{cursor:pointer}.app{width:min(1180px,100%);margin:auto;padding:10px 10px 78px}.hero{position:relative;top:auto;z-index:2;background:rgba(7,26,51,.96);backdrop-filter:blur(12px);border:1px solid #233f61;border-radius:18px;padding:10px 12px;box-shadow:var(--shadow)}.head{display:flex;justify-content:space-between;align-items:center;gap:10px}.head h1{font-size:clamp(1.2rem,4vw,1.8rem);margin:0}.version{color:var(--orange2);font-weight:1000;font-size:.82rem}.save-pill{font-size:.7rem;color:#a9c7e4;font-weight:800}.tabs{display:flex;gap:6px;overflow:auto;padding-top:9px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{white-space:nowrap;border:1px solid #2d5178;background:#0d294c;color:#dcecff;border-radius:999px;padding:8px 12px;font-weight:900}.tab.active{background:var(--orange);color:#211406;border-color:var(--orange)}.page{display:none}.page.active{display:block}.card{background:linear-gradient(180deg,#102b4e,#0c2342);border:1px solid #274b70;border-radius:16px;padding:12px;margin-top:10px;box-shadow:0 8px 18px rgba(0,0,0,.16)}.section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}.section-title h2,.section-title h3{margin:0;font-size:1.05rem}.small{font-size:.72rem;color:var(--muted);font-weight:750}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.field{display:grid;gap:4px}.field label,.field>span{font-size:.72rem;color:#b8d0e7;font-weight:950;text-transform:uppercase;letter-spacing:.04em}.field input,.field select,input,select{width:100%;min-width:0;border:2px solid #dfe8f1;background:#f8fbff;color:#112033;border-radius:10px;padding:10px 11px;font-weight:900;outline:0}input:focus,select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,138,0,.15)}button.primary,button.secondary,button.danger,button.good{border:0;border-radius:10px;padding:10px 12px;font-weight:1000;min-height:42px}.primary{background:linear-gradient(180deg,var(--orange2),var(--orange));color:#231606;box-shadow:0 3px 0 #9a4a00}.secondary{background:#dceeff;color:#124d82}.danger{background:#ffdddd;color:#8f1f1f}.good{background:#bff4d8;color:#075f34}.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.grow{flex:1}.toast{position:fixed;left:50%;bottom:82px;transform:translateX(-50%);background:#06172c;border:1px solid var(--orange);padding:10px 14px;border-radius:12px;font-weight:900;display:none;z-index:99;max-width:90vw;text-align:center}
@@ -7167,7 +7167,7 @@ body.standings-preview-open{overflow:hidden!important}
 </div></div><nav class="tabs" id="tabs"></nav></div></div></header>
 <div id="toast" class="toast"></div>
 <main id="pages"></main>
-<footer class="app-footer">© SRL - AMB • v96</footer>
+<footer class="app-footer">© SRL - AMB • v133.1</footer>
 </div>
 <nav class="bottom" id="bottom"></nav>
 <script>
@@ -10332,45 +10332,11 @@ function lockCurrentHighHand(){
 
   if(!state.completedWeeks.includes(weekNum))state.completedWeeks.push(weekNum);
 
-  // Advance automatically to the next week.
-  const maxWeek=Math.max(1,Number(state.settings.seasonWeeks||1)+Number(state.settings.bufferWeeks||0));
-  const nextWeek=Math.min(maxWeek,weekNum+1);
+  // Save the completed week under its existing ownership before advancing.
+  state.tournamentStarted=false;
+  if(state.clock){state.clock.running=false;state.clock.endAt=null;}
+  save();render();toast(`Week ${weekNum} locked • sync, then prepare the next week`);
 
-  if(nextWeek>weekNum){
-    state.currentWeek=nextWeek;
-    state.tournamentStarted=false;
-    state.finalTableSet=false;
-    state.tables=[];
-    state.outOrder=[];
-    state.moveHighlights=[];
-    state.currentBlind=0;
-    state.clock={
-      running:false,
-      left:(state.settings.blindLevels[0]?.min||state.settings.blindLevelDuration||15)*60,
-      last:Date.now()
-    };
-
-    // New week attendance and optional buy-ins start fresh.
-    state.players.forEach(p=>{
-      p.checkedIn=false;
-      p.checkinAt=null;
-      p.out=false;
-      p.table=null;
-      p.seat=null;
-      p.bountyBuyIn=false;
-      p.highHandBuyIn=false;
-      p.badBeatBuyIn=false;
-      p.startingAddonSelected=false;
-      p._activeChoiceWeek=nextWeek;
-    });
-    state._activeAttendanceWeek=nextWeek;
-  }
-
-  save();
-  render();
-  toast(nextWeek>weekNum
-    ? `Week ${weekNum} locked • High Hand saved • Week ${nextWeek} ready`
-    : `Week ${weekNum} locked • High Hand saved`);
 }
 
 function renderLive(){
@@ -23348,7 +23314,7 @@ async function nfpl133Request(body){
  try{const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),redirect:'follow',signal:controller.signal});const result=JSON.parse(await response.text());return result;}finally{clearTimeout(timer)}
 }
 function nfpl133RememberOwner(key,result){if(result.owner)nfpl133.owners[key]=result.owner;else delete nfpl133.owners[key];nfpl133Persist();}
-function nfpl133Queue(){const key=nfpl133GameKey();if(!nfpl133EventId())return;const pack=nfplV119Pack();nfpl133.queues[key]={gameKey:key,pack,version:(nfpl133.queueSeq=(nfpl133.queueSeq||0)+1),token:nfpl133.tokens[key]||'',deviceId:nfplSync.deviceId,savedAt:Date.now()};nfpl133Persist();nfpl133Note('Saved on this device • waiting to upload');}
+function nfpl133Queue(){const key=nfpl133GameKey();if(!nfpl133EventId())return;const pack=nfplV119Pack();nfpl133.queues[key]={gameKey:key,pack,version:(nfpl133.queueSeq=(nfpl133.queueSeq||0)+1),token:nfpl133.tokens[key]||'',deviceId:nfplSync.deviceId,savedAt:Date.now()};nfpl133Persist();nfpl133Note('Saved on this device • waiting to upload');scheduleAutoSync();}
 function nfpl133Apply(pack,revision,updatedAt){
  const wanted=nfpl133EventId(),tab=state.tab;const own=nfpl133IsOwner();if(!own&&state.clock)state.clock.running=false;
  nfplV119ApplyPack(pack,revision,updatedAt);
@@ -23365,18 +23331,18 @@ function nfpl133ScopedPack(cloud,queued){
  merged.appVersion='NFPL-v133';merged.syncMeta=local.syncMeta;return merged;
 }
 async function nfpl133Flush(key=nfpl133GameKey()){
- if(nfpl133.busy||!nfpl133.capable)return false;const queued=nfpl133.queues[key];if(!queued)return true;
+ if(nfpl133.busy||!nfpl133.capable)return false;const queued=nfpl133.queues[key];if(!queued)return true;if(queued.paused)return false;
  nfpl133.busy=true;try{
   const status=await nfpl133Request({action:'status',gameKey:key});if(!status.ok)throw new Error(status.message||'Connection update required');nfpl133RememberOwner(key,status);
   if(status.owner&&(status.owner.deviceId!==nfplSync.deviceId||queued.token!==nfpl133.tokens[key])){nfpl133Note('This device has saved changes. Tracking belongs to '+status.owner.deviceType+'.');return false;}
   const pulled=await nfpl133Request({action:'pull'});if(!pulled.ok)throw new Error('Could not read shared game');
   const cloud=pulled.found?JSON.parse(pulled.payload):{};const merged=nfpl133ScopedPack(cloud,queued);
   const result=await nfpl133Request({action:'push',gameKey:key,baseRevision:Number(pulled.revision||0),payloadJson:JSON.stringify(merged),roleTokens:{[key]:queued.token},force:false});
-  if(!result.ok){nfpl133Note(['not_owner','owner_required','ownership_revoked','other_week_owned'].includes(result.code||result.error)?'Tracking is on the other device • saved changes kept here':result.conflict?'Shared game changed • upload will retry':'Upload pending • '+(result.message||'retry when connected'));return false;}
+  if(!result.ok){nfpl133Note(['not_owner','owner_required','ownership_revoked','other_week_owned'].includes(result.code||result.error)?'Tracking is on the other device • saved changes kept here':result.conflict?'Shared game changed • upload will retry':'Upload pending • '+(result.message||result.error||result.code||'retry when connected'));return false;}
   // Do not delete changes saved while this request was in flight.
   if(nfpl133.queues[key]?.version===queued.version){delete nfpl133.queues[key];nfpl133Persist();}
   nfplSync.revision=Number(result.revision||0);nfplSync.lastCloudAt=result.updatedAt||'';saveSyncConfig();nfpl133Note(nfpl133.queues[key]?'New changes waiting to upload':'Synced • both devices can view and print');return !nfpl133.queues[key];
- }catch(e){nfpl133Note('Saved on this device • upload when connected');return false;}finally{nfpl133.busy=false;}
+ }catch(e){nfpl133Note('Upload failed • '+(e.message||String(e)));return false;}finally{nfpl133.busy=false;}
 }
 async function nfpl133Pull(){
  if(nfpl133.busy)return;nfpl133.busy=true;try{
@@ -23388,7 +23354,7 @@ async function nfpl133Pull(){
   if(result.found&&(!nfpl133.queues[key]||(nfpl133Owner()&&nfpl133Owner().deviceId!==nfplSync.deviceId)))nfpl133Apply(JSON.parse(result.payload),Number(result.revision||0),result.updatedAt||'');
   else {nfplSync.revision=Number(result.revision||0);saveSyncConfig();}
   nfpl133Note(nfpl133IsOwner()?'Tracking on this '+nfpl133.deviceType:nfpl133Owner()?'View / print • tracking on '+nfpl133Owner().deviceType:'Choose your setup device, then choose the tracking device at game start');
- }catch(e){nfpl133Note(nfpl133IsOwner()?'Saved locally • upload when connected':'Offline • viewing saved results');}finally{nfpl133.busy=false;render();}
+ }catch(e){nfpl133Note('Sync failed • '+(e.message||String(e)));}finally{nfpl133.busy=false;render();}
  await nfpl133Flush();
 }
 async function nfpl133ChooseSetup(type){if(!['Phone','Laptop'].includes(type))return;nfpl133.deviceType=type;nfpl133Persist();await nfpl133Pull();}
@@ -23431,6 +23397,79 @@ render=function(){const result=nfpl133OriginalRender.apply(this,arguments);for(c
 nfpl133.authoritative=JSON.parse(JSON.stringify(state));render();
 window.addEventListener('online',()=>nfpl133Pull());setTimeout(()=>nfpl133Pull(),800);
 
+</script>
+<script id="nfpl133-1-sync-repair">
+// v133.1: claim before uploading tracking data; prepare next week as a server transaction.
+async function nfpl134PrepareWeek(){
+ if(!nfpl133.deviceType)return toast('Choose Phone or Laptop under Set up on first');
+ try{
+  const cap=await nfpl133Request({action:'capabilities'});
+  if(!cap.advanceWeek)return nfpl133Note('Backend update required for next-week sync (v133.1)');nfpl133.capable=true;
+  const localKey=nfpl133GameKey();
+  if(nfpl133.queues[localKey]&&nfpl133IsOwner()&&!await nfpl133Flush(localKey))return;
+  const pulled=await nfpl133Request({action:'pull'});
+  if(!pulled.ok||!pulled.found)throw Error(pulled.message||pulled.error||'No shared league found');
+  const pack=JSON.parse(pulled.payload),id=nfpl133EventId();
+  const shared=String(pack.state?.settings?.eventId)===id?pack.state:(pack.eventLibrary||[]).find(e=>String(e.id)===id)?.state;
+  if(!shared)throw Error('Saved league ID is not in shared storage');
+  const week=Number(shared.currentWeek||1),key=id+':'+week;
+  if(!(shared.archives||[]).some(a=>Number(a.week)===week&&a.finalized)){
+   if(week!==Number(state.currentWeek)){nfpl133Apply(pack,pulled.revision,pulled.updatedAt);render();}
+   return nfpl133Note('Week '+week+' is ready • choose tracking, check players in, then start');
+  }
+  const result=await nfpl133Request({action:'advance',eventId:id,baseRevision:Number(pulled.revision||0),roleTokens:{[key]:nfpl133.tokens[key]||''}});
+  if(!result.ok)throw Error(result.message||result.error||'Could not prepare next week');
+  if(nfpl133.queues[key]&&!nfpl133IsOwner()){
+   // Retain any rejected local snapshot for recovery; never submit it over the new week.
+   nfpl133.queues[key].paused=true;
+  }
+  delete nfpl133.tokens[key];delete nfpl133.owners[key];
+  nfpl133Apply(JSON.parse(result.payload),result.revision,result.updatedAt);
+  state.tab='players';nfpl133Persist();render();
+  await nfpl133Claim(false);
+  nfpl133Note(nfpl133IsOwner()?'Week '+state.currentWeek+' ready • check players in, then start':'Week '+state.currentWeek+' prepared • choose its tracking device');
+ }catch(e){nfpl133Note('Next week not prepared • '+e.message);}
+}
+async function nfpl133Claim(startAfter=false){
+ const selected=state.settings.trackingDeviceType133||nfpl133.deviceType;
+ if(!selected)return toast('Choose Phone or Laptop for tracking');
+ if(nfpl133.deviceType!==selected)return toast('Open this game on the selected '+selected+' and choose its setup device');
+ try{
+  if(!nfpl133.capable){await nfpl133Pull();if(!nfpl133.capable)return;}
+  const key=nfpl133GameKey();
+  if(!nfpl133IsOwner()){
+   const status=await nfpl133Request({action:'status',gameKey:key});
+   if(!status.ok)throw Error(status.message||status.error||'Could not check tracking');
+   nfpl133RememberOwner(key,status);
+   if(status.owner&&status.owner.deviceId!==nfplSync.deviceId)return nfpl133Note('View / print • tracking on '+status.owner.deviceType);
+   const result=await nfpl133Request({action:'claim',gameKey:key,baseRevision:Number(status.revision||0)});
+   if(!result.ok)throw Error(result.message||result.error||'Tracking not claimed');
+   nfpl133.tokens[key]=result.token;nfpl133RememberOwner(key,result);
+   nfplSync.revision=Number(result.revision||0);saveSyncConfig();
+   if(nfpl133.queues[key])nfpl133.queues[key].token=result.token;
+   nfpl133Persist();
+  }
+  state.settings.trackingDeviceType133=selected;
+  nfpl133Queue();if(!await nfpl133Flush(key))return;
+  if(startAfter&&currentWeekArchiveFinalized())return await nfpl134PrepareWeek();
+  if(startAfter&&!state.tournamentStarted){
+   if(!checkedPlayers().length)return toast('Check players in before starting');
+   state.currentBlind=0;state.clock={running:false,left:nfplClockDurationSeconds(0),last:Date.now(),endAt:null};
+   nfpl133OriginalStart();startClock();
+  }
+  render();
+ }catch(e){nfpl133Note('Tracking not started • '+e.message);}
+}
+// Starting a game always goes through the repaired claim/start path.
+startTournament=function(){return nfpl133Claim(true);};
+// Keep historical browsing local. Preparing a new week uses nfpl134PrepareWeek.
+autoSelectCurrentLeagueWeek=function(){state.currentWeek=Math.max(1,Number(state.currentWeek||1));};
+setStandingsWeek=function(v){state.currentWeek=Math.max(1,Math.min(Number(state.settings.seasonWeeks||99),Number(v)||1));state.tab='live';render();};
+const nfpl134Panel=nfpl133Panel;
+nfpl133Panel=function(){return nfpl134Panel().replace('<small>The tracking device', '<div class="row"><button class="secondary" data-nfpl133-safe onclick="nfpl134PrepareWeek()">Prepare next league week</button></div><small>The tracking device');};
+// Poll shared results on viewers; queued owner saves continue through the owner protocol.
+setInterval(()=>{if(document.visibilityState==='visible'&&!nfpl133.busy){if(nfpl133IsOwner())nfpl133Flush();else nfpl133Pull();}},10000);
+render();
 </script>
 </body>
 </html>
