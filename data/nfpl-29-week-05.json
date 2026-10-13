@@ -1,0 +1,107 @@
+{
+  "week": 5,
+  "league": "NFPL-29",
+  "finish_order": [
+    {
+      "player": "Yoda",
+      "place": 19,
+      "points": 19
+    },
+    {
+      "player": "Frenchy",
+      "place": 18,
+      "points": 18
+    },
+    {
+      "player": "Joker",
+      "place": 17,
+      "points": 17
+    },
+    {
+      "player": "Kayla",
+      "place": 16,
+      "points": 16
+    },
+    {
+      "player": "Ernie",
+      "place": 15,
+      "points": 15
+    },
+    {
+      "player": "Sam",
+      "place": 14,
+      "points": 14
+    },
+    {
+      "player": "Marty",
+      "place": 13,
+      "points": 13
+    },
+    {
+      "player": "Q2B",
+      "place": 12,
+      "points": 12
+    },
+    {
+      "player": "LPQ",
+      "place": 11,
+      "points": 11
+    },
+    {
+      "player": "J2C",
+      "place": 10,
+      "points": 10
+    },
+    {
+      "player": "Angela",
+      "place": 9,
+      "points": 9
+    },
+    {
+      "player": "Steve",
+      "place": 8,
+      "points": 8
+    },
+    {
+      "player": "All Day",
+      "place": 7,
+      "points": 7
+    },
+    {
+      "player": "Kim",
+      "place": 6,
+      "points": 6
+    },
+    {
+      "player": "SK",
+      "place": 5,
+      "points": 5
+    },
+    {
+      "player": "7X",
+      "place": 4,
+      "points": 4
+    },
+    {
+      "player": "JK",
+      "place": 3,
+      "points": 3
+    },
+    {
+      "player": "Teddy",
+      "place": 2,
+      "points": 2
+    },
+    {
+      "player": "Cephus",
+      "place": 1,
+      "points": 0
+    }
+  ],
+  "high_hand": {
+    "winner": "Wendy",
+    "hand": "AAAJJ",
+    "hand_type": "Full House (Aces over Jacks)"
+  },
+  "status": "prepared_for_import_not_applied_to_live_app"
+}
